@@ -1,0 +1,11 @@
+
+Story:
+A drone flies into a cave, realizes it's inside a fantasy dungeon with ogres and skeletons
+Help the drone find the teleporation crystal so it can teleport to it's mothership
+
+MVP:
+Same as the book
+
+Furhter Dev:
+Same as the book
+
