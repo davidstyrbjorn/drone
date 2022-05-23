@@ -70,6 +70,10 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         // Clear all layers
         ctx.set_active_console(0);
+        // Now grab mouse position and insert as resource
+        // There is a Point::from_tuple(...) but i wanted to try enum accessor pattern here
+        self.resources
+            .insert(Point::new(ctx.mouse_pos().0, ctx.mouse_pos().1));
         ctx.cls();
         ctx.set_active_console(1);
         ctx.cls();
