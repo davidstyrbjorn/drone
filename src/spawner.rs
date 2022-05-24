@@ -12,8 +12,8 @@ pub fn spawn_player(ecs: &mut World, pos: Point) {
             glyph: to_cp437('@'),
         },
         Health {
-            current: 20,
-            max: 20,
+            current: 100,
+            max: 100,
         },
     ));
 }
@@ -40,11 +40,24 @@ pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Poin
             color: ColorPair::new(WHITE, BLACK),
             glyph,
         },
-        MovingRandomly {},
+        ChasingPlayer {},
         Health {
             current: hp,
             max: hp,
         },
         Name(name),
+    ));
+}
+
+pub fn spawn_telerportation_crystal(ecs: &mut World, pos: Point) {
+    ecs.push((
+        Item,
+        TelerportationCrystal,
+        pos,
+        Render {
+            color: ColorPair::new(WHITE, BLACK),
+            glyph: to_cp437('l'),
+        },
+        Name("Teleportation Crystal".to_string()),
     ));
 }

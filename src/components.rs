@@ -27,6 +27,15 @@ pub struct Enemy; // Enemy tag component
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct MovingRandomly; // Tag component as the others above
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ChasingPlayer;
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Item;
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct TelerportationCrystal;
+
 // Message component
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct WantsToMove {

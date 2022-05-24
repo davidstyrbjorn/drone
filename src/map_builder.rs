@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::{map, prelude::*};
 
 const NUM_ROOMS: usize = 20;
 
@@ -6,6 +6,7 @@ pub struct MapBuilder {
     pub map: Map,
     pub rooms: Vec<Rect>,
     pub player_start: Point,
+    pub teleportation_crystal_start: Point,
 }
 
 impl MapBuilder {
@@ -14,12 +15,39 @@ impl MapBuilder {
             map: Map::new(),
             rooms: Vec::new(),
             player_start: Point::zero(),
+            teleportation_crystal_start: Point::zero(),
         };
 
         map_builder.fill(TileType::Wall); // Fills the map with walls, to carve out ground
         map_builder.build_random_rooms(rng); // Places random rooms (rects)
         map_builder.build_corridors(rng); // Connects each room with walkways (manhattan)
         map_builder.player_start = map_builder.rooms[0].center(); // Place player in center of first room
+                                                                  // Create a djikstra map and get the furthest away point
+        let djikstra_map = DijkstraMap::new(
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
+            &vec![map_builder.map.point2d_to_index(map_builder.player_start)],
+            &map_builder.map,
+            1024.0,
+        );
+        // djikstra_map.map element value is MAX if the tile is not reachable
+        const UNREACHABLE: &f32 = &f32::MAX;
+        // TODO: I don't really get this, try to figure this out later
+        map_builder.teleportation_crystal_start = map_builder.map.index_to_point2d(
+            djikstra_map
+                .map
+                .iter()
+                .enumerate() // Returns (index, distance)
+                .filter(|(_, dist)| *dist < UNREACHABLE)
+                // we use max_by because we have tuples, but we want to compare e.1, and then grab e.0 (index)
+                .max_by(|a, b| a.1.partial_cmp(b.1).unwrap())
+                .unwrap()
+                .0,
+        );
+        println!(
+            "CRYSTAL: {}, {}",
+            map_builder.teleportation_crystal_start.x, map_builder.teleportation_crystal_start.y
+        );
         map_builder
     }
 

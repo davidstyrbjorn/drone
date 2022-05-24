@@ -44,6 +44,7 @@ impl State {
         let mut rng = RandomNumberGenerator::new();
         let map_builder = MapBuilder::new(&mut rng);
         spawn_player(&mut ecs, map_builder.player_start);
+        spawn_telerportation_crystal(&mut ecs, map_builder.teleportation_crystal_start);
         // Spawn monsters in each room
         map_builder
             .rooms
@@ -62,6 +63,69 @@ impl State {
             input_systems: build_input_scheduler(),
             player_systems: build_player_scheduler(),
             monster_systems: build_monster_scheduler(),
+        }
+    }
+
+    fn reset_game_state(&mut self) {
+        // Reset legion stuff and other variables!
+        self.ecs = World::default();
+        self.resources = Resources::default();
+        let mut rng = RandomNumberGenerator::new();
+        let map_builder = MapBuilder::new(&mut rng);
+        // Spawn in entities
+        spawn_player(&mut self.ecs, map_builder.player_start);
+        spawn_telerportation_crystal(&mut self.ecs, map_builder.teleportation_crystal_start);
+        map_builder
+            .rooms
+            .iter()
+            .skip(1)
+            .map(|r| r.center())
+            .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, pos));
+
+        // Insert resources into ecs system
+        self.resources.insert(map_builder.map);
+        self.resources.insert(Camera::new(map_builder.player_start));
+        self.resources.insert(TurnState::AwaitingInput);
+    }
+
+    fn game_over(&mut self, ctx: &mut BTerm) {
+        ctx.set_active_console(2);
+        ctx.print_color_centered(2, RED, BLACK, "...the drone has crashed...");
+        ctx.print_color_centered(
+            4,
+            WHITE,
+            BLACK,
+            "DESTROYED by a monoster, your drone's journey has prematurely ended",
+        );
+        ctx.print_color_centered(5, WHITE, BLACK, "The telerportation crystal remains not found so this drone did not make it home to its fellow drones.");
+        ctx.print_color_centered(
+            8,
+            YELLOW,
+            BLACK,
+            "Be not frail, you can fly in with another drone and try again.",
+        );
+        ctx.print_color_centered(9, GREEN, BLACK, "Press R to fly again");
+
+        // Check for reset input
+        if let Some(VirtualKeyCode::R) = ctx.key {
+            self.reset_game_state();
+        }
+    }
+
+    fn victory(&mut self, ctx: &mut BTerm) {
+        ctx.set_active_console(2);
+        ctx.print_color_centered(2, GREEN, BLACK, "You have won!");
+        ctx.print_color_centered(
+            4,
+            WHITE,
+            BLACK,
+            "The drone could teleport home! The drone can now drone forever!!",
+        );
+        ctx.print_color_centered(7, GREEN, BLACK, "Press R to help another drone");
+
+        // Check for reset input
+        if let Some(VirtualKeyCode::R) = ctx.key {
+            self.reset_game_state();
         }
     }
 }
@@ -91,14 +155,13 @@ impl GameState for State {
             TurnState::AwaitingInput => self
                 .input_systems
                 .execute(&mut self.ecs, &mut self.resources),
-            TurnState::PlayerTurn => {
-                self.player_systems
-                    .execute(&mut self.ecs, &mut self.resources);
-            }
-            TurnState::MonsterTurn => {
-                self.monster_systems
-                    .execute(&mut self.ecs, &mut self.resources);
-            }
+            TurnState::PlayerTurn => self
+                .player_systems
+                .execute(&mut self.ecs, &mut self.resources),
+            TurnState::MonsterTurn => self
+                .monster_systems
+                .execute(&mut self.ecs, &mut self.resources),
+            TurnState::GameOver => self.game_over(ctx),
         }
 
         // Render draw buffer
