@@ -1,4 +1,13 @@
-use crate::{map, prelude::*};
+use crate::prelude::*;
+
+use empty::EmptyArchitect;
+
+mod empty;
+mod rooms;
+
+trait MapArchitect {
+    fn new(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder;
+}
 
 const NUM_ROOMS: usize = 20;
 
@@ -7,33 +16,31 @@ pub struct MapBuilder {
     pub rooms: Vec<Rect>,
     pub player_start: Point,
     pub teleportation_crystal_start: Point,
+    pub monster_spawns: Vec<Point>,
 }
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut map_builder = MapBuilder {
-            map: Map::new(),
-            rooms: Vec::new(),
-            player_start: Point::zero(),
-            teleportation_crystal_start: Point::zero(),
-        };
+        let mut architect = EmptyArchitect {};
+        architect.new(rng)
+    }
 
-        map_builder.fill(TileType::Wall); // Fills the map with walls, to carve out ground
-        map_builder.build_random_rooms(rng); // Places random rooms (rects)
-        map_builder.build_corridors(rng); // Connects each room with walkways (manhattan)
-        map_builder.player_start = map_builder.rooms[0].center(); // Place player in center of first room
-                                                                  // Create a djikstra map and get the furthest away point
+    fn fill(&mut self, tile: TileType) {
+        // Lambda function passed to for each which operatoes on the mutable itertor
+        self.map.tiles.iter_mut().for_each(|t| *t = tile);
+    }
+
+    fn find_most_distant(&self) -> Point {
         let djikstra_map = DijkstraMap::new(
             SCREEN_WIDTH,
             SCREEN_HEIGHT,
-            &vec![map_builder.map.point2d_to_index(map_builder.player_start)],
-            &map_builder.map,
+            &vec![self.map.point2d_to_index(self.player_start)],
+            &self.map,
             1024.0,
         );
-        // djikstra_map.map element value is MAX if the tile is not reachable
         const UNREACHABLE: &f32 = &f32::MAX;
         // TODO: I don't really get this, try to figure this out later
-        map_builder.teleportation_crystal_start = map_builder.map.index_to_point2d(
+        self.map.index_to_point2d(
             djikstra_map
                 .map
                 .iter()
@@ -43,17 +50,7 @@ impl MapBuilder {
                 .max_by(|a, b| a.1.partial_cmp(b.1).unwrap())
                 .unwrap()
                 .0,
-        );
-        println!(
-            "CRYSTAL: {}, {}",
-            map_builder.teleportation_crystal_start.x, map_builder.teleportation_crystal_start.y
-        );
-        map_builder
-    }
-
-    fn fill(&mut self, tile: TileType) {
-        // Lambda function passed to for each which operatoes on the mutable itertor
-        self.map.tiles.iter_mut().for_each(|t| *t = tile);
+        )
     }
 
     fn build_random_rooms(&mut self, rng: &mut RandomNumberGenerator) {

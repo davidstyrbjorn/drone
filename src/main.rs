@@ -45,13 +45,10 @@ impl State {
         let map_builder = MapBuilder::new(&mut rng);
         spawn_player(&mut ecs, map_builder.player_start);
         spawn_telerportation_crystal(&mut ecs, map_builder.teleportation_crystal_start);
-        // Spawn monsters in each room
         map_builder
-            .rooms
+            .monster_spawns
             .iter()
-            .skip(1) // The player room is skipped
-            .map(|r| r.center()) // Grab each rectangle center
-            .for_each(|pos| spawn_monster(&mut ecs, &mut rng, pos));
+            .for_each(|pos| spawn_monster(&mut ecs, &mut rng, *pos));
 
         // Inject our map and camera as resources (since this is what is shared in our program)
         resources.insert(map_builder.map);
@@ -75,6 +72,10 @@ impl State {
         // Spawn in entities
         spawn_player(&mut self.ecs, map_builder.player_start);
         spawn_telerportation_crystal(&mut self.ecs, map_builder.teleportation_crystal_start);
+        map_builder
+            .monster_spawns
+            .iter()
+            .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, *pos));
         map_builder
             .rooms
             .iter()
@@ -162,6 +163,7 @@ impl GameState for State {
                 .monster_systems
                 .execute(&mut self.ecs, &mut self.resources),
             TurnState::GameOver => self.game_over(ctx),
+            TurnState::Victory => self.victory(ctx),
         }
 
         // Render draw buffer

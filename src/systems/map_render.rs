@@ -1,14 +1,29 @@
 use crate::prelude::*;
 
 #[system]
-pub fn map_render(#[resource] map: &Map, #[resource] camera: &Camera) {
+#[read_component(FieldOfView)]
+#[read_component(Player)]
+pub fn map_render(ecs: &SubWorld, #[resource] map: &Map, #[resource] camera: &Camera) {
+    // Get the player's field of view component
+    let mut fov = <&FieldOfView>::query().filter(component::<Player>());
+    let player_fov = fov.iter(ecs).nth(0).unwrap();
+    // Start a draw batch
     let mut draw_batch = DrawBatch::new();
     draw_batch.target(0);
     for y in camera.top_y..=camera.bottom_y {
         for x in camera.left_x..camera.right_x {
             let pt = Point::new(x, y);
             let offset = Point::new(camera.left_x, camera.top_y);
-            if map.in_bounds(pt) {
+            // Also, check if player fov HashSet has this point i.e is it visible?
+            let idx = map_idx(pt.x, pt.y);
+            if map.in_bounds(pt)
+                && (player_fov.visible_tiles.contains(&pt) | map.revealed_tiles[idx])
+            {
+                let tint = if player_fov.visible_tiles.contains(&pt) {
+                    WHITE
+                } else {
+                    DARK_GRAY
+                };
                 // Go from x,y to tile index with this helper function
                 let idx = map_idx(x, y);
                 // Convert idx to glyph
@@ -17,7 +32,7 @@ pub fn map_render(#[resource] map: &Map, #[resource] camera: &Camera) {
                     TileType::Wall => to_cp437('#'),
                 };
                 // Render to the batch
-                draw_batch.set(pt - offset, ColorPair::new(WHITE, BLACK), glyph);
+                draw_batch.set(pt - offset, ColorPair::new(tint, BLACK), glyph);
             }
         }
     }
