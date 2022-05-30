@@ -17,11 +17,20 @@ pub struct Health {
     pub max: i32,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Damage(pub i32);
+
+// Items can inflict damage but they aren't monsters so we need a way to indentify that an item is a weapon
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Weapon;
+
 #[derive(Clone, PartialEq)]
 pub struct Name(pub String);
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Player; // Player does not have any fields, it become a tag component
+pub struct Player {
+    pub map_level: u32,
+}
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Enemy; // Enemy tag component
@@ -51,6 +60,14 @@ pub struct WantsToAttack {
     pub victim: Entity,
 }
 
+// Message of intent for this as well, potentially we can let monsters use items if they want...
+// what is the monster is below certain health and has a potion close to it, perhaps go for the potion instead
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ActivateItem {
+    pub used_by: Entity,
+    pub item: Entity,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct FieldOfView {
     pub visible_tiles: HashSet<Point>,
@@ -75,3 +92,14 @@ impl FieldOfView {
         }
     }
 }
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ProvidesHealing {
+    pub amount: i32,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ProvidesDungeonMap;
+
+#[derive(Clone, PartialEq)]
+pub struct Carried(pub Entity);

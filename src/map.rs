@@ -9,6 +9,9 @@ const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
 pub enum TileType {
     Wall,
     Floor,
+    Floor2, // decorative versions of floor
+    Floor3,
+    Exit,
 }
 
 pub struct Map {
@@ -24,7 +27,14 @@ pub fn map_idx(x: i32, y: i32) -> usize {
 impl Map {
     // Helper to determine if point is safe in both dimensionality and is on a valid tile
     pub fn can_enter_tile(&self, point: Point) -> bool {
-        self.in_bounds(point) && self.tiles[map_idx(point.x, point.y)] == TileType::Floor
+        self.in_bounds(point)
+            && ([
+                TileType::Floor,
+                TileType::Floor2,
+                TileType::Floor3,
+                TileType::Exit,
+            ]
+            .contains(&self.tiles[map_idx(point.x, point.y)]))
     }
 
     // Helper to determine if a point is inside of our map
@@ -36,39 +46,6 @@ impl Map {
         Self {
             tiles: vec![TileType::Floor; NUM_TILES],
             revealed_tiles: vec![false; NUM_TILES],
-        }
-    }
-
-    pub fn render(&self, ctx: &mut BTerm, camera: &Camera) {
-        ctx.set_active_console(0); // Enable the background layer
-        for y in camera.top_y..camera.bottom_y {
-            for x in camera.left_x..camera.right_x {
-                if self.in_bounds(Point::new(x, y)) {
-                    // Go from x,y to tile index with this helper function
-                    let idx = map_idx(x, y);
-                    // Map to something tileable
-                    match self.tiles[idx] {
-                        TileType::Floor => {
-                            ctx.set(
-                                x - camera.left_x,
-                                y - camera.top_y,
-                                YELLOW,
-                                BLACK,
-                                to_cp437('.'),
-                            );
-                        }
-                        TileType::Wall => {
-                            ctx.set(
-                                x - camera.left_x,
-                                y - camera.top_y,
-                                GREEN,
-                                BLACK,
-                                to_cp437('#'),
-                            );
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -134,7 +111,7 @@ impl BaseMap for Map {
 
     // Is the tile a wall? (opaque)
     fn is_opaque(&self, idx: usize) -> bool {
-        self.tiles[idx as usize] != TileType::Floor
+        ![TileType::Floor, TileType::Floor2, TileType::Floor3].contains(&self.tiles[idx as usize])
     }
 }
 

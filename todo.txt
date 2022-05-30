@@ -1,0 +1,29 @@
+
+- BUG [x] weapon pickup bug, can pickup multiple weapon items
+
+- BUG [x] weapoon consume, can press and "consume" weapon items for it's effects
+
+- [] implement cave theme 
+
+- [] random TileType::Floor for decorations 
+
+- [] add prefab room rull of MONSTERS
+
+- [] make themes according to levels
+    * level 1,2 forest
+    * level 3,4 cave
+    * level 5 dungeon
+
+- [] ambience background sound
+
+- [] sfx systems (message components + resource of sounds?)
+
+- [] redo enemies + items + balancing
+
+- [] new player sprite
+
+- [] main menu 
+
+- [] event log lower right corner
+
+- [] limit inventory space to 10 items (10 alpha keys to use items so...)

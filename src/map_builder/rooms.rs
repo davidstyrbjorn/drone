@@ -5,6 +5,24 @@ pub struct RoomArchitect {}
 
 impl MapArchitect for RoomArchitect {
     fn new(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder {
-        todo!()
+        let mut mb = MapBuilder {
+            map: Map::new(),
+            rooms: Vec::new(),
+            monster_spawns: Vec::new(),
+            player_start: Point::zero(),
+            teleportation_crystal_start: Point::zero(),
+            theme: super::themes::DungeonTheme::new(),
+        };
+
+        mb.fill(TileType::Wall);
+        mb.build_random_rooms(rng);
+        mb.build_corridors(rng);
+        mb.player_start = mb.rooms[0].center();
+        mb.teleportation_crystal_start = mb.find_most_distant();
+        for room in mb.rooms.iter().skip(1) {
+            mb.monster_spawns.push(room.center());
+        }
+
+        mb
     }
 }

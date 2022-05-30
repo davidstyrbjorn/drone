@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 mod camera;
 mod components;
 mod map;
@@ -42,18 +44,20 @@ impl State {
         let mut resources = Resources::default();
         // Creates a map builder from which we grab our map
         let mut rng = RandomNumberGenerator::new();
-        let map_builder = MapBuilder::new(&mut rng);
+        let mut map_builder = MapBuilder::new(&mut rng);
         spawn_player(&mut ecs, map_builder.player_start);
-        spawn_telerportation_crystal(&mut ecs, map_builder.teleportation_crystal_start);
-        map_builder
-            .monster_spawns
-            .iter()
-            .for_each(|pos| spawn_monster(&mut ecs, &mut rng, *pos));
+        // For the love of god, SEAL THE EXITS - krieger
+        let exit_idx = map_builder
+            .map
+            .point2d_to_index(map_builder.teleportation_crystal_start);
+        map_builder.map.tiles[exit_idx] = TileType::Exit;
+        spawn_level(&mut ecs, &mut rng, 0, &map_builder.monster_spawns);
 
         // Inject our map and camera as resources (since this is what is shared in our program)
         resources.insert(map_builder.map);
         resources.insert(Camera::new(map_builder.player_start));
         resources.insert(TurnState::AwaitingInput);
+        resources.insert(map_builder.theme);
         Self {
             ecs,
             resources,
@@ -68,25 +72,23 @@ impl State {
         self.ecs = World::default();
         self.resources = Resources::default();
         let mut rng = RandomNumberGenerator::new();
-        let map_builder = MapBuilder::new(&mut rng);
+        let mut map_builder = MapBuilder::new(&mut rng);
         // Spawn in entities
         spawn_player(&mut self.ecs, map_builder.player_start);
-        spawn_telerportation_crystal(&mut self.ecs, map_builder.teleportation_crystal_start);
-        map_builder
-            .monster_spawns
-            .iter()
-            .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, *pos));
-        map_builder
-            .rooms
-            .iter()
-            .skip(1)
-            .map(|r| r.center())
-            .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, pos));
+        // For the love of god, SEAL THE EXITS - krieger
+        // spawn_telerportation_crystal(&mut self.ecs, map_builder.teleportation_crystal_start);
+        let exit_idx = map_builder
+            .map
+            .point2d_to_index(map_builder.teleportation_crystal_start);
+        map_builder.map.tiles[exit_idx] = TileType::Exit;
+        // Spawn monsters and items
+        spawn_level(&mut self.ecs, &mut rng, 0, &map_builder.monster_spawns);
 
         // Insert resources into ecs system
         self.resources.insert(map_builder.map);
         self.resources.insert(Camera::new(map_builder.player_start));
         self.resources.insert(TurnState::AwaitingInput);
+        self.resources.insert(map_builder.theme);
     }
 
     fn game_over(&mut self, ctx: &mut BTerm) {
@@ -129,6 +131,82 @@ impl State {
             self.reset_game_state();
         }
     }
+
+    fn advance_level(&mut self) {
+        // Get the player entity id
+        let player_entity = *<Entity>::query()
+            .filter(component::<Player>())
+            .iter(&mut self.ecs)
+            .nth(0)
+            .unwrap();
+
+        // Create a Set of entities to not kill, insert player
+        let mut entities_to_keep = HashSet::new();
+        entities_to_keep.insert(player_entity);
+
+        // Make sure all the carried items are kept to next level
+        <(Entity, &Carried)>::query()
+            .iter(&mut self.ecs)
+            .filter(|(_, carry)| carry.0 == player_entity)
+            .map(|(e, _)| *e)
+            .for_each(|e| {
+                entities_to_keep.insert(e);
+            });
+
+        // A much more effiecent way of performing multiple commands to the ECS system
+        // is through this method
+        let mut command_buffer = CommandBuffer::new(&mut self.ecs);
+        for e in Entity::query().iter(&self.ecs) {
+            // Will iterate over EVERY entity in the world
+            // Do we keep it or remove it?
+            if !entities_to_keep.contains(e) {
+                command_buffer.remove(*e);
+            }
+        }
+
+        // Mark field of view as dirty
+        // Making it not retain to the next level
+        // Notice the iter_mut(...) here since we modify the fov component
+        <&mut FieldOfView>::query()
+            .iter_mut(&mut self.ecs)
+            .for_each(|fov| fov.is_dirty = true);
+
+        // Create a map just like we've done in other functions before
+        let mut rng = RandomNumberGenerator::new();
+        let mut mb = MapBuilder::new(&mut rng);
+
+        // Calculate new map level and start pos
+        let mut map_level = 0;
+        <(&mut Player, &mut Point)>::query()
+            .iter_mut(&mut self.ecs)
+            .for_each(|(player, pos)| {
+                player.map_level += 1;
+                map_level = player.map_level;
+                pos.x = mb.player_start.x;
+                pos.y = mb.player_start.y;
+            });
+
+        // Decide on wheter we spawn staircase or teleportation crystal
+        if map_level == 2 {
+            spawn_telerportation_crystal(&mut self.ecs, mb.teleportation_crystal_start);
+        } else {
+            let exit_idx = mb.map.point2d_to_index(mb.teleportation_crystal_start);
+            mb.map.tiles[exit_idx] = TileType::Exit;
+        }
+
+        spawn_level(
+            &mut self.ecs,
+            &mut rng,
+            map_level as usize,
+            &mb.monster_spawns,
+        );
+
+        // Finally add our ECS resources as always
+        self.resources.insert(mb.map);
+        self.resources.insert(Camera::new(mb.player_start));
+        self.resources.insert(TurnState::AwaitingInput);
+        self.resources.insert(mb.theme);
+    }
 }
 
 impl GameState for State {
@@ -164,6 +242,7 @@ impl GameState for State {
                 .execute(&mut self.ecs, &mut self.resources),
             TurnState::GameOver => self.game_over(ctx),
             TurnState::Victory => self.victory(ctx),
+            TurnState::NextLevel => self.advance_level(),
         }
 
         // Render draw buffer

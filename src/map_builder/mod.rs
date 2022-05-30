@@ -1,12 +1,27 @@
 use crate::prelude::*;
+use themes::*;
 
-use empty::EmptyArchitect;
+use self::{
+    automata::CellularAutomataArchitect, drunkard::DrunkardsWalkArchitect, prefab::apply_prefab,
+    rooms::RoomArchitect,
+};
 
+mod automata;
+mod drunkard;
 mod empty;
+mod prefab;
 mod rooms;
+mod themes;
 
 trait MapArchitect {
     fn new(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder;
+}
+
+// A large part of how Rust enforced safe concurrency between threads is through these new types 'Sync' and 'Send'
+// Sync lets us safe access this object from multipile threads
+// Send lets us safe share this object between threads
+pub trait MapTheme: Sync + Send {
+    fn tile_to_render(&self, tile_type: TileType) -> FontCharType;
 }
 
 const NUM_ROOMS: usize = 20;
@@ -17,12 +32,39 @@ pub struct MapBuilder {
     pub player_start: Point,
     pub teleportation_crystal_start: Point,
     pub monster_spawns: Vec<Point>,
+    pub theme: Box<dyn MapTheme>,
 }
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut architect = EmptyArchitect {};
-        architect.new(rng)
+        let mut theme_name: &str = "dungeon";
+        // Build map and select appropiate theme
+        let mut architect: Box<dyn MapArchitect> = match rng.range(0, 3) {
+            0 => {
+                // TODO: make this cave themed
+                theme_name = "forest";
+                Box::new(DrunkardsWalkArchitect {})
+            }
+            1 => {
+                theme_name = "dungeon";
+                Box::new(RoomArchitect {})
+            }
+            _ => {
+                theme_name = "forest";
+                Box::new(CellularAutomataArchitect {})
+            }
+        };
+
+        let mut mb = architect.new(rng);
+        apply_prefab(&mut mb, rng);
+
+        match theme_name {
+            "dungeon" => mb.theme = DungeonTheme::new(),
+            "forest" => mb.theme = ForestTheme::new(),
+            _ => mb.theme = DungeonTheme::new(),
+        }
+
+        mb
     }
 
     fn fill(&mut self, tile: TileType) {
@@ -129,5 +171,34 @@ impl MapBuilder {
                 self.map.tiles[idx as usize] = TileType::Floor;
             }
         }
+    }
+
+    // Returns a vector of spawn points atleast 10 points away from the player
+    fn spawn_monsters(&self, start: &Point, rng: &mut RandomNumberGenerator) -> Vec<Point> {
+        const NUM_MONSTERS: usize = 50;
+        let mut spawnable_tiles: Vec<Point> = self
+            .map
+            .tiles
+            .iter()
+            .enumerate()
+            .filter(|(idx, t)| {
+                **t == TileType::Floor
+                    && DistanceAlg::Pythagoras.distance2d(*start, self.map.index_to_point2d(*idx))
+                        > 10.0
+            })
+            .map(|(idx, _)| self.map.index_to_point2d(idx))
+            .collect();
+
+        let mut spawns = Vec::new();
+        for _ in 0..NUM_MONSTERS {
+            if spawnable_tiles.is_empty() {
+                break;
+            }
+            let target_index = rng.random_slice_index(&spawnable_tiles).unwrap();
+            spawns.push(spawnable_tiles[target_index].clone());
+            spawnable_tiles.remove(target_index);
+        }
+
+        spawns
     }
 }
