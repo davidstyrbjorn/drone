@@ -42,6 +42,16 @@ pub fn hud(ecs: &SubWorld) {
         format!("Level: {}", map_level + 1),
         ColorPair::new(YELLOW, BLACK),
     );
+    let theme = match map_level {
+        0 | 1 => "FOREST",
+        2 | 3 => "CAVE",
+        _ => "THE DUNGEON",
+    };
+    draw_batch.print_color_right(
+        Point::new(SCREEN_WIDTH * 2, 2),
+        format!("{}", theme),
+        ColorPair::new(YELLOW, BLACK),
+    );
 
     // Items HUD
     let mut item_query = <(&Item, &Name, &Carried)>::query();

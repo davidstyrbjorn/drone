@@ -36,22 +36,21 @@ pub struct MapBuilder {
 }
 
 impl MapBuilder {
-    pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut theme_name: &str = "dungeon";
+    pub fn new(rng: &mut RandomNumberGenerator, map_level: u32) -> Self {
+        let mut theme_name: &str = "cave";
         // Build map and select appropiate theme
-        let mut architect: Box<dyn MapArchitect> = match rng.range(0, 3) {
-            0 => {
-                // TODO: make this cave themed
-                theme_name = "forest";
+        let mut architect: Box<dyn MapArchitect> = match map_level {
+            // 0 | 1 => {
+            //     theme_name = "forest";
+            //     Box::new(CellularAutomataArchitect {})
+            // }
+            0 | 3 => {
+                theme_name = "cave";
                 Box::new(DrunkardsWalkArchitect {})
             }
-            1 => {
+            _ => {
                 theme_name = "dungeon";
                 Box::new(RoomArchitect {})
-            }
-            _ => {
-                theme_name = "forest";
-                Box::new(CellularAutomataArchitect {})
             }
         };
 
@@ -61,6 +60,7 @@ impl MapBuilder {
         match theme_name {
             "dungeon" => mb.theme = DungeonTheme::new(),
             "forest" => mb.theme = ForestTheme::new(),
+            "cave" => mb.theme = CaveTheme::new(),
             _ => mb.theme = DungeonTheme::new(),
         }
 

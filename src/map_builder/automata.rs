@@ -19,13 +19,66 @@ impl CellularAutomataArchitect {
         });
     }
 
+    fn sprinkle_details(&mut self, rng: &mut RandomNumberGenerator, map: &mut Map) {
+        let dirs: [Point; 4] = [
+            Point::new(-1, 0),
+            Point::new(1, 0),
+            Point::new(0, -1),
+            Point::new(0, 1),
+        ];
+        // First sprinkle completely random points on the map
+        map.tiles.iter_mut().for_each(|t| {
+            if rng.range(0, 15) < 1 {
+                *t = TileType::Floor2;
+            }
+        });
+
+        let mut points_to_grow_grass: Vec<Point> = Vec::new();
+
+        for y in 1..SCREEN_HEIGHT - 1 {
+            for x in 1..SCREEN_WIDTH - 1 {
+                let idx = map.point2d_to_index(Point::new(x, y));
+                // Is it a grass tile?
+                if map.tiles[idx] == TileType::Floor2 {
+                    dirs.iter().for_each(|dir| {
+                        let pos = Point::new(x, y) + *dir;
+                        // Is neighbour in bound + a floor? turn it into grass
+                        if map.in_bounds(pos) {
+                            let neighbour_idx = map.point2d_to_index(pos);
+                            if map.tiles[neighbour_idx] == TileType::Floor {
+                                points_to_grow_grass.push(pos);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        // Actually grow the grass
+        points_to_grow_grass.iter().for_each(|pos| {
+            let idx = map.point2d_to_index(*pos);
+            map.tiles[idx] = TileType::Floor2;
+        });
+
+        // Sprinkle some random mushrooms on the map finally
+        // First sprinkle completely random points on the map
+        map.tiles.iter_mut().for_each(|t| {
+            if rng.range(0, 15) < 1 {
+                *t = TileType::Floor3;
+            }
+        });
+    }
+
     // Very important help for the cellular automation algo.
     fn count_neighbors(&self, x: i32, y: i32, map: &Map) -> usize {
         let mut neighbors = 0;
         for dy in -1..=1 {
             for dx in -1..=1 {
                 // Don't count current tile; only count its neighbors
-                if !(dx == 0 && dy == 0) && map.tiles[map_idx(x + dx, y + dy)] == TileType::Wall {
+                if !(dx == 0 && dy == 0)
+                    && [TileType::Wall, TileType::Wall2]
+                        .contains(&map.tiles[map_idx(x + dx, y + dy)])
+                {
                     neighbors += 1;
                 }
             }
@@ -93,10 +146,7 @@ impl MapArchitect for CellularAutomataArchitect {
         mb.monster_spawns = mb.spawn_monsters(&start, rng);
         mb.player_start = start;
         mb.teleportation_crystal_start = mb.find_most_distant();
-        println!(
-            "Crystal {}, {}",
-            mb.teleportation_crystal_start.x, mb.teleportation_crystal_start.y
-        );
+        self.sprinkle_details(rng, &mut mb.map);
 
         mb
     }

@@ -2,6 +2,7 @@ use crate::prelude::*;
 
 pub struct DungeonTheme {}
 pub struct ForestTheme {}
+pub struct CaveTheme {}
 
 impl DungeonTheme {
     pub fn new() -> Box<dyn MapTheme> {
@@ -10,6 +11,12 @@ impl DungeonTheme {
 }
 
 impl ForestTheme {
+    pub fn new() -> Box<dyn MapTheme> {
+        Box::new(Self {})
+    }
+}
+
+impl CaveTheme {
     pub fn new() -> Box<dyn MapTheme> {
         Box::new(Self {})
     }
@@ -25,9 +32,10 @@ impl ForestTheme {
 
 impl MapTheme for DungeonTheme {
     fn tile_to_render(&self, tile_type: TileType) -> FontCharType {
+        // TODO: Map Floor 2 + Floor 3 to decoration
         match tile_type {
-            TileType::Floor | TileType::Floor2 | TileType::Floor3 => to_cp437('.'),
-            TileType::Wall => to_cp437('#'),
+            TileType::Floor | TileType::Floor2 | TileType::Floor3 => to_cp437('M'),
+            TileType::Wall | TileType::Wall2 => to_cp437('#'),
             TileType::Exit => to_cp437('>'),
         }
     }
@@ -36,8 +44,23 @@ impl MapTheme for DungeonTheme {
 impl MapTheme for ForestTheme {
     fn tile_to_render(&self, tile_type: TileType) -> FontCharType {
         match tile_type {
-            TileType::Floor | TileType::Floor2 | TileType::Floor3 => to_cp437('='),
-            TileType::Wall => to_cp437('"'),
+            TileType::Floor => to_cp437('='),
+            TileType::Floor2 => to_cp437(';'),
+            TileType::Floor3 => to_cp437('<'),
+            TileType::Wall | TileType::Wall2 => to_cp437('"'),
+            TileType::Exit => to_cp437('>'),
+        }
+    }
+}
+
+impl MapTheme for CaveTheme {
+    // TODO: Map Floor 2 + Floor 3 to decoration
+    fn tile_to_render(&self, tile_type: TileType) -> FontCharType {
+        match tile_type {
+            TileType::Floor => to_cp437('-'),
+            TileType::Floor2 | TileType::Floor3 => to_cp437(','),
+            TileType::Wall => to_cp437('\\'),
+            TileType::Wall2 => to_cp437('$'),
             TileType::Exit => to_cp437('>'),
         }
     }

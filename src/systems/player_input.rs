@@ -1,7 +1,6 @@
 // Nested module
 // There will be some proc macros with alot of boilerplate code, ignore this for now
 // as this is a very advanced Rust feature
-
 use crate::prelude::*;
 
 #[system]

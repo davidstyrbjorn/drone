@@ -3,20 +3,26 @@
 
 - BUG [x] weapoon consume, can press and "consume" weapon items for it's effects
 
-- [] implement cave theme 
+- BUG [] all seeing eye reveals map exit
 
-- [] random TileType::Floor for decorations 
+- [x] implement cave theme 
 
-- [] add prefab room rull of MONSTERS
+- [x] FOREST random TileType::Floor for decorations 
 
-- [] make themes according to levels
-    * level 1,2 forest
-    * level 3,4 cave
-    * level 5 dungeon
+- [x] CAVE random TileType::Floor for decorations 
 
-- [] ambience background sound
+- [] DUNGEON random TileType::Floor for decorations 
 
-- [] sfx systems (message components + resource of sounds?)
+- [x] make themes according to levels
+        * level 0,1 forest
+        * level 2,3 cave
+        * level 4 dungeon
+
+- [] NEW ITEM item that paralyzes enemies from moving for 3 turns (spooky screech)
+
+- [] ambience background sound https://docs.rs/rodio/latest/rodio/# 
+
+- [] sfx systems (message components + resource of sounds?) https://docs.rs/rodio/latest/rodio/#
 
 - [] redo enemies + items + balancing
 
@@ -27,3 +33,7 @@
 - [] event log lower right corner
 
 - [] limit inventory space to 10 items (10 alpha keys to use items so...)
+
+- [] limit number of waiting turns 
+
+- [] add prefab room full of MONSTERS

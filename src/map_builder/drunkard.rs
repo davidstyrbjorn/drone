@@ -3,11 +3,45 @@ use crate::prelude::*;
 
 pub struct DrunkardsWalkArchitect {}
 
-const STAGGER_DISTANCE: usize = 400;
+const STAGGER_DISTANCE: usize = 300;
 const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
 const DESIRED_FLOOR: usize = NUM_TILES / 3;
 
 impl DrunkardsWalkArchitect {
+    fn carve_decorations(
+        &mut self,
+        start: usize,
+        targets: Vec<usize>,
+        rng: &mut RandomNumberGenerator,
+        map: &mut Map,
+    ) {
+        let djikstra_map = DijkstraMap::new(SCREEN_WIDTH, SCREEN_HEIGHT, &vec![start], map, 2048.0);
+        // Carve paths in the map from each target to start
+        targets.iter().for_each(|target| {
+            let mut current = target.clone();
+            while current != start {
+                if let Some(desitnation) =
+                    DijkstraMap::find_lowest_exit(&djikstra_map, current, map)
+                {
+                    // Check distance
+                    let pos1 = map.index_to_point2d(current);
+                    let pos2 = map.index_to_point2d(start);
+                    if DistanceAlg::Pythagoras.distance2d(pos1, pos2) < 1.2 {
+                        break;
+                    }
+                    map.tiles[desitnation] = TileType::Floor2;
+                    current = desitnation;
+                }
+            }
+        });
+
+        // Turn some tiles into decorated
+        map.tiles
+            .iter_mut()
+            .filter(|t| (**t == TileType::Wall && rng.range(0, 10) > 5))
+            .for_each(|t| *t = TileType::Wall2);
+    }
+
     fn drunkard(&mut self, start: &Point, rng: &mut RandomNumberGenerator, map: &mut Map) {
         let mut drunkard_pos = start.clone();
         let mut distance_staggered = 0;
@@ -86,6 +120,17 @@ impl MapArchitect for DrunkardsWalkArchitect {
         mb.monster_spawns = mb.spawn_monsters(&center, rng);
         mb.player_start = center;
         mb.teleportation_crystal_start = mb.find_most_distant();
+
+        // Carve some path decorations
+        self.carve_decorations(
+            mb.map.point2d_to_index(center),
+            (&mb.monster_spawns)
+                .into_iter()
+                .map(|p| mb.map.point2d_to_index(*p))
+                .collect(),
+            rng,
+            &mut mb.map,
+        );
 
         mb
     }

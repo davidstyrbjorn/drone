@@ -44,7 +44,7 @@ impl State {
         let mut resources = Resources::default();
         // Creates a map builder from which we grab our map
         let mut rng = RandomNumberGenerator::new();
-        let mut map_builder = MapBuilder::new(&mut rng);
+        let mut map_builder = MapBuilder::new(&mut rng, 0);
         spawn_player(&mut ecs, map_builder.player_start);
         // For the love of god, SEAL THE EXITS - krieger
         let exit_idx = map_builder
@@ -72,7 +72,7 @@ impl State {
         self.ecs = World::default();
         self.resources = Resources::default();
         let mut rng = RandomNumberGenerator::new();
-        let mut map_builder = MapBuilder::new(&mut rng);
+        let mut map_builder = MapBuilder::new(&mut rng, 0);
         // Spawn in entities
         spawn_player(&mut self.ecs, map_builder.player_start);
         // For the love of god, SEAL THE EXITS - krieger
@@ -173,7 +173,17 @@ impl State {
 
         // Create a map just like we've done in other functions before
         let mut rng = RandomNumberGenerator::new();
-        let mut mb = MapBuilder::new(&mut rng);
+        // Get the player and thus map level
+        let mut mb = MapBuilder::new(
+            &mut rng,
+            self.ecs
+                .entry_ref(player_entity)
+                .unwrap()
+                .get_component::<Player>()
+                .unwrap()
+                .map_level
+                + 1,
+        );
 
         // Calculate new map level and start pos
         let mut map_level = 0;
@@ -187,7 +197,7 @@ impl State {
             });
 
         // Decide on wheter we spawn staircase or teleportation crystal
-        if map_level == 2 {
+        if map_level == 4 {
             spawn_telerportation_crystal(&mut self.ecs, mb.teleportation_crystal_start);
         } else {
             let exit_idx = mb.map.point2d_to_index(mb.teleportation_crystal_start);
