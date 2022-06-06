@@ -11,14 +11,14 @@
 
 - [x] CAVE random TileType::Floor for decorations 
 
-- [] DUNGEON random TileType::Floor for decorations 
+- [x] DUNGEON random TileType::Floor for decorations 
 
 - [x] make themes according to levels
         * level 0,1 forest
         * level 2,3 cave
         * level 4 dungeon
 
-- [] NEW ITEM item that paralyzes enemies from moving for 3 turns (spooky screech)
+- [x] NEW ITEM item that paralyzes enemies from moving for 3 turns (spooky screech)
 
 - [] ambience background sound https://docs.rs/rodio/latest/rodio/# 
 
@@ -26,14 +26,16 @@
 
 - [] redo enemies + items + balancing
 
-- [] new player sprite
+- [] new player sprite (DRONE)
 
-- [] main menu 
+- BUG [] items are spawning in walls
+
+- [x] main menu 
 
 - [] event log lower right corner
 
-- [] limit inventory space to 10 items (10 alpha keys to use items so...)
+- [x] limit inventory space to 10 items (10 alpha keys to use items so...)
 
-- [] limit number of waiting turns 
+- [x] limit number of waiting turns 
 
-- [] add prefab room full of MONSTERS
+- [x] add prefab room full of MONSTERS

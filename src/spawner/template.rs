@@ -47,6 +47,7 @@ impl Templates {
         rng: &mut RandomNumberGenerator,
         level: usize,
         spawn_points: &[Point],
+        guaranteed_monster_spawn_points: &[Point],
     ) {
         let mut available_entites = Vec::new();
         // Fill our array of available_entites
@@ -60,11 +61,27 @@ impl Templates {
                 }
             });
 
+        // Grab available monsters
+        let mut available_monsters = Vec::new();
+        self.entities
+            .iter()
+            .filter(|e| e.levels.contains(&level) && e.entity_type == EntityType::Enemy)
+            .for_each(|t| {
+                for _ in 0..t.frequency {
+                    available_monsters.push(t);
+                }
+            });
+
         // Create a command buffer with spawn commands for each spawn point
         let mut command_buffer = CommandBuffer::new(ecs);
         spawn_points.iter().for_each(|point| {
             if let Some(entity) = rng.random_slice_entry(&available_entites) {
                 self.spawn_entity(point, entity, &mut command_buffer);
+            }
+        });
+        guaranteed_monster_spawn_points.iter().for_each(|point| {
+            if let Some(monster_entity) = rng.random_slice_entry(&available_monsters) {
+                self.spawn_entity(point, monster_entity, &mut command_buffer);
             }
         });
         command_buffer.flush(ecs);
@@ -106,6 +123,7 @@ impl Templates {
                 .for_each(|(provides, n)| match provides.as_str() {
                     "Healing" => commands.add_component(entity, ProvidesHealing { amount: *n }),
                     "MagicMap" => commands.add_component(entity, ProvidesDungeonMap {}),
+                    "GroundStomp" => commands.add_component(entity, ProvidesStun {}),
                     _ => {
                         println!("we don't know how to provide {}", provides)
                     }

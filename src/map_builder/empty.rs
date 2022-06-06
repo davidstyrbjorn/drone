@@ -8,8 +8,8 @@ impl MapArchitect for EmptyArchitect {
     fn new(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder {
         let mut mb = MapBuilder {
             map: Map::new(),
-            rooms: Vec::new(),
             monster_spawns: Vec::new(),
+            guaranteed_monster_spawns: Vec::new(),
             player_start: Point::zero(),
             teleportation_crystal_start: Point::zero(),
             theme: super::themes::DungeonTheme::new(),

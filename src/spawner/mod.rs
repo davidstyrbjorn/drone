@@ -10,15 +10,25 @@ pub fn spawn_level(
     rng: &mut RandomNumberGenerator,
     level: usize,
     spawn_points: &[Point],
+    guaranteed_monster_spawn_points: &[Point],
 ) {
     let template = Templates::load();
-    template.spawn_entities(ecs, rng, level, spawn_points);
+    template.spawn_entities(
+        ecs,
+        rng,
+        level,
+        spawn_points,
+        guaranteed_monster_spawn_points,
+    );
 }
 
 pub fn spawn_player(ecs: &mut World, pos: Point) {
     // Pushes a new player with Player, Point and Render components
     ecs.push((
-        Player { map_level: 0 },
+        Player {
+            map_level: 0,
+            wait_count: 8,
+        },
         pos,
         Render {
             color: ColorPair::new(WHITE, BLACK),

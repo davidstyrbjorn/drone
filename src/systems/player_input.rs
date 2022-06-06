@@ -6,7 +6,7 @@ use crate::prelude::*;
 #[system]
 // These decorators help Legion know which data we are planning on reading/writing to
 #[read_component(Point)]
-#[read_component(Player)]
+#[write_component(Player)]
 #[read_component(Enemy)]
 #[write_component(Health)]
 #[read_component(Item)]
@@ -19,6 +19,7 @@ pub fn player_input(
     #[resource] turn_state: &mut TurnState,
 ) {
     let mut players = <(Entity, &Point)>::query().filter(component::<Player>());
+    let mut did_something = false;
     if let Some(key) = *key {
         // Get our movement vector
         let delta = match key {
@@ -33,12 +34,20 @@ pub fn player_input(
                     .find_map(|(entity, pos)| Some((*entity, *pos)))
                     .unwrap();
 
+                // Check how many items we already got on us, used in the filter when checking for item we're standing on
+                let number_of_carried_components = <(Entity, &Carried)>::query()
+                    .iter(ecs)
+                    .filter(|(_e, c)| c.0 == player)
+                    .count();
+
                 // Find the item we are on and and remove Point component
                 // replace with Carried component
                 let mut items = <(Entity, &Item, &Point)>::query();
                 items
                     .iter(ecs)
-                    .filter(|(_entity, _item, &item_pos)| item_pos == player_pos)
+                    .filter(|(_entity, _item, &item_pos)| {
+                        (item_pos == player_pos && number_of_carried_components <= 10)
+                    })
                     .for_each(|(entity, _item, _item_pos)| {
                         // Ocotupus-preventing code for multiple weapons on player
                         if let Ok(e) = ecs.entry_ref(*entity) {
@@ -62,15 +71,15 @@ pub fn player_input(
                 Point::new(0, 0)
             }
             // Alot of ways to consume items
-            VirtualKeyCode::Key1 => use_item(0, ecs, commands),
-            VirtualKeyCode::Key2 => use_item(1, ecs, commands),
-            VirtualKeyCode::Key3 => use_item(2, ecs, commands),
-            VirtualKeyCode::Key4 => use_item(3, ecs, commands),
-            VirtualKeyCode::Key5 => use_item(4, ecs, commands),
-            VirtualKeyCode::Key6 => use_item(5, ecs, commands),
-            VirtualKeyCode::Key7 => use_item(6, ecs, commands),
-            VirtualKeyCode::Key8 => use_item(7, ecs, commands),
-            VirtualKeyCode::Key9 => use_item(8, ecs, commands),
+            VirtualKeyCode::Key1 => use_item(0, ecs, commands, &mut did_something),
+            VirtualKeyCode::Key2 => use_item(1, ecs, commands, &mut did_something),
+            VirtualKeyCode::Key3 => use_item(2, ecs, commands, &mut did_something),
+            VirtualKeyCode::Key4 => use_item(3, ecs, commands, &mut did_something),
+            VirtualKeyCode::Key5 => use_item(4, ecs, commands, &mut did_something),
+            VirtualKeyCode::Key6 => use_item(5, ecs, commands, &mut did_something),
+            VirtualKeyCode::Key7 => use_item(6, ecs, commands, &mut did_something),
+            VirtualKeyCode::Key8 => use_item(7, ecs, commands, &mut did_something),
+            VirtualKeyCode::Key9 => use_item(8, ecs, commands, &mut did_something),
 
             _ => Point::new(0, 0),
         };
@@ -82,7 +91,6 @@ pub fn player_input(
             .unwrap();
         let mut enemies = <(Entity, &Point)>::query().filter(component::<Enemy>());
 
-        let mut did_something = false;
         if delta.x != 0 || delta.y != 0 {
             let mut hit_something = false;
             enemies
@@ -115,10 +123,29 @@ pub fn player_input(
         }
 
         *turn_state = TurnState::PlayerTurn;
+
+        // TODO This seems a little buggy, look at later
+        // if did_something {
+        //     *turn_state = TurnState::PlayerTurn;
+        // } else {
+        //     // Check the wait counter on player
+        //     let mut player = <&mut Player>::query().iter_mut(ecs).nth(0).unwrap();
+        //     if player.wait_count > 0 {
+        //         *turn_state = TurnState::PlayerTurn;
+        //         player.wait_count -= 1;
+        //     } else {
+        //         *turn_state = TurnState::AwaitingInput;
+        //     }
+        // }
     }
 }
 
-fn use_item(n: usize, ecs: &mut SubWorld, commands: &mut CommandBuffer) -> Point {
+fn use_item(
+    n: usize,
+    ecs: &mut SubWorld,
+    commands: &mut CommandBuffer,
+    did_something: &mut bool,
+) -> Point {
     // Find the player entity
     let player_entity = <(Entity, &Player)>::query()
         .iter(ecs)
@@ -136,6 +163,7 @@ fn use_item(n: usize, ecs: &mut SubWorld, commands: &mut CommandBuffer) -> Point
     if let Some(item_entity) = item_entity {
         // Make sure item_entity is not a weapon
         let mut is_weapon = false;
+        *did_something = true;
         if let Ok(e) = ecs.entry_ref(item_entity) {
             let res = e.get_component::<Weapon>();
             if res.is_ok() {

@@ -11,6 +11,7 @@ mod movement;
 mod player_input;
 mod random_move;
 mod tooltip;
+mod use_effect;
 mod use_item;
 
 // Dividing the Scheduler
@@ -69,5 +70,6 @@ pub fn build_monster_scheduler() -> Schedule {
         .add_system(entity_render::entity_render_system())
         .add_system(hud::hud_system())
         .add_system(end_turn::end_turn_system())
+        .add_system(use_effect::use_items_system())
         .build()
 }

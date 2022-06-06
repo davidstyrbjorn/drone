@@ -6,6 +6,7 @@ use crate::prelude::*;
 #[read_component(Name)]
 #[read_component(Player)]
 #[read_component(FieldOfView)]
+#[read_component(Stunned)]
 pub fn tooltips(ecs: &SubWorld, #[resource] mouse_pos: &Point, #[resource] camera: &Camera) {
     // Player fov
     let mut fov = <&FieldOfView>::query().filter(component::<Player>());
@@ -30,11 +31,18 @@ pub fn tooltips(ecs: &SubWorld, #[resource] mouse_pos: &Point, #[resource] camer
             // Check if entity has health component, otherwise just display name
             let display =
                 if let Ok(health) = ecs.entry_ref(*entity).unwrap().get_component::<Health>() {
-                    format!("{} : {} / {} hp", &name.0, health.current, health.max)
+                    format!("{} : {} / {} hp\n", &name.0, health.current, health.max)
                 } else {
                     name.0.clone()
                 };
-            draw_batch.print(screen_pos, &display);
+            let stunned =
+                if let Ok(stunned) = ecs.entry_ref(*entity).unwrap().get_component::<Stunned>() {
+                    format!("Stunned ({})", stunned.0)
+                } else {
+                    "".to_string()
+                };
+            let res = display + &stunned;
+            draw_batch.print(screen_pos, res);
         });
 
     draw_batch.submit(10100).expect("Batch error");

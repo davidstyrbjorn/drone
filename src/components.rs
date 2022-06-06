@@ -29,6 +29,7 @@ pub struct Name(pub String);
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Player {
+    pub wait_count: u8,
     pub map_level: u32,
 }
 
@@ -101,5 +102,12 @@ pub struct ProvidesHealing {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ProvidesDungeonMap;
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ProvidesStun;
+
 #[derive(Clone, PartialEq)]
 pub struct Carried(pub Entity);
+
+// Lasting effect
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Stunned(pub i32);

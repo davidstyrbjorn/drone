@@ -5,20 +5,26 @@ Templates(
             entity_type: Item,
             name: "Healing Potion", glyph: '!', levels: [0, 1, 2],
             provides: Some([("Healing", 6)]),
-            frequency: 1
+            frequency: 0
         ),
         // Weak ass potion
         Template(
             entity_type: Item,
             name: "Healing Potion", glyph: '!', levels: [0, 1, 2],
             provides: Some([("Healing", 2)]),
-            frequency: 5
+            frequency: 0
         ),
         Template(
             entity_type: Item,
             name: "All Seeing Eyes", glyph: '{', levels: [0, 1, 2],
-            provides: Some([("MagicMap", 6)]),
-            frequency: 1
+            provides: Some([("MagicMap", 10)]),
+            frequency: 50
+        ),
+        Template(
+            entity_type: Item,
+            name: "Ground Stomp", glyph: 'e', levels: [0, 1, 2],
+            provides: Some([("GroundStomp", 10)]),
+            frequency: 2
         ),
         /* ENEMIES */
         Template (
@@ -75,6 +81,6 @@ Templates(
             name: "Huge Sword", glyph: '/', levels: [2],
             frequency: 1,
             base_damage: Some(3)
-        )
+        ),
     ]
 )

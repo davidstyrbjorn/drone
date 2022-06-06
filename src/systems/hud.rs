@@ -16,7 +16,10 @@ pub fn hud(ecs: &SubWorld) {
     draw_batch.target(2);
 
     // Instructional text
-    draw_batch.print_centered(1, "Fly around the Dungeon. Cursor keys to move.");
+    draw_batch.print_centered(
+        2,
+        "Fly around the Dungeon. Cursor keys to move.".to_ascii_uppercase(),
+    );
     // Draw health bar
     draw_batch.bar_horizontal(
         Point::zero(),
@@ -27,7 +30,7 @@ pub fn hud(ecs: &SubWorld) {
     );
     draw_batch.print_color_centered(
         0,
-        format!(" Health {} / {}", player_health.current, player_health.max),
+        format!(" HEALTH {} / {}", player_health.current, player_health.max),
         ColorPair::new(WHITE, RED3),
     );
 

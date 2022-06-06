@@ -51,12 +51,18 @@ impl State {
             .map
             .point2d_to_index(map_builder.teleportation_crystal_start);
         map_builder.map.tiles[exit_idx] = TileType::Exit;
-        spawn_level(&mut ecs, &mut rng, 0, &map_builder.monster_spawns);
+        spawn_level(
+            &mut ecs,
+            &mut rng,
+            0,
+            &map_builder.monster_spawns,
+            &map_builder.guaranteed_monster_spawns,
+        );
 
         // Inject our map and camera as resources (since this is what is shared in our program)
         resources.insert(map_builder.map);
         resources.insert(Camera::new(map_builder.player_start));
-        resources.insert(TurnState::AwaitingInput);
+        resources.insert(TurnState::Menu);
         resources.insert(map_builder.theme);
         Self {
             ecs,
@@ -64,6 +70,33 @@ impl State {
             input_systems: build_input_scheduler(),
             player_systems: build_player_scheduler(),
             monster_systems: build_monster_scheduler(),
+        }
+    }
+
+    fn menu(&mut self, ctx: &mut BTerm) {
+        ctx.set_active_console(2);
+
+        ctx.print_centered(40, "DRONE");
+        ctx.print_centered(45, "PRESS ANY BUTTON TO CRASH LAND ON EARTH");
+        ctx.print_right(
+            SCREEN_WIDTH * 2,
+            (SCREEN_HEIGHT * 2) - 5,
+            "BY: DAVID STYRBJÖRN",
+        );
+        ctx.print_right(
+            SCREEN_WIDTH * 2,
+            (SCREEN_HEIGHT * 2) - 3,
+            "ART: EMIL BERTHOLDSSON",
+        );
+        ctx.print_right(
+            SCREEN_WIDTH * 2,
+            (SCREEN_HEIGHT * 2) - 1,
+            "BALANCE HELP: MAX BENECKE",
+        );
+
+        // Check if the user has pressed any key
+        if let Some(_) = ctx.key {
+            self.resources.insert(TurnState::AwaitingInput);
         }
     }
 
@@ -82,7 +115,13 @@ impl State {
             .point2d_to_index(map_builder.teleportation_crystal_start);
         map_builder.map.tiles[exit_idx] = TileType::Exit;
         // Spawn monsters and items
-        spawn_level(&mut self.ecs, &mut rng, 0, &map_builder.monster_spawns);
+        spawn_level(
+            &mut self.ecs,
+            &mut rng,
+            0,
+            &map_builder.monster_spawns,
+            &map_builder.guaranteed_monster_spawns,
+        );
 
         // Insert resources into ecs system
         self.resources.insert(map_builder.map);
@@ -209,6 +248,7 @@ impl State {
             &mut rng,
             map_level as usize,
             &mb.monster_spawns,
+            &mb.guaranteed_monster_spawns,
         );
 
         // Finally add our ECS resources as always
@@ -241,6 +281,7 @@ impl GameState for State {
         // Depending on TurnState we execute different scheduler
         let current_state = self.resources.get::<TurnState>().unwrap().clone();
         match current_state {
+            TurnState::Menu => self.menu(ctx),
             TurnState::AwaitingInput => self
                 .input_systems
                 .execute(&mut self.ecs, &mut self.resources),

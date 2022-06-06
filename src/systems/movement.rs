@@ -2,6 +2,7 @@ use crate::prelude::*;
 
 #[system(for_each)]
 #[read_component(Player)]
+#[read_component(Stunned)]
 #[read_component(FieldOfView)]
 pub fn movement(
     entity: &Entity,
@@ -24,9 +25,12 @@ pub fn movement(
                     });
                 }
             }
-            // By adding a new point we replace the existing one
-            // This is faster since it lets Legion delegate the command instead of us assigning the data ourselves
-            commands.add_component(want_move.entity, want_move.destination);
+            // If want_move.entity has a Stunned, don't move
+            if entry.get_component::<Stunned>().is_err() {
+                // By adding a new point we replace the existing one
+                // This is faster since it lets Legion delegate the command instead of us assigning the data ourselves
+                commands.add_component(want_move.entity, want_move.destination);
+            }
         }
     }
 

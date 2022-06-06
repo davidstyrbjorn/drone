@@ -5,6 +5,9 @@ use crate::prelude::*;
 #[read_component(ProvidesHealing)]
 #[write_component(Health)]
 #[read_component(ProvidesDungeonMap)]
+#[read_component(ProvidesStun)]
+#[read_component(Point)]
+#[write_component(Stunned)]
 pub fn use_items(ecs: &mut SubWorld, commands: &mut CommandBuffer, #[resource] map: &mut Map) {
     // to-do list of healings
     let mut healing_to_apply = Vec::<(Entity, i32)>::new();
@@ -14,15 +17,36 @@ pub fn use_items(ecs: &mut SubWorld, commands: &mut CommandBuffer, #[resource] m
         .iter(ecs)
         .for_each(|(entity, activate)| {
             // It is possible that the item does not exist so we do this
-            let item = ecs.entry_ref(activate.item);
-            if let Ok(item) = item {
-                // Decide what effect type it is
+            if let Ok(item) = ecs.entry_ref(activate.item) {
+                /* Decide what effect type it is */
                 if let Ok(healing) = item.get_component::<ProvidesHealing>() {
                     healing_to_apply.push((activate.used_by, healing.amount));
                 }
-
                 if let Ok(_) = item.get_component::<ProvidesDungeonMap>() {
                     map.revealed_tiles.iter_mut().for_each(|t| *t = true);
+                }
+                if let Ok(_) = item.get_component::<ProvidesStun>() {
+                    // Look at neighbouring tiles and tell enemies that they are stunned
+
+                    if let Ok(holder) = ecs.entry_ref(activate.used_by) {
+                        if let Ok(pt) = holder.get_component::<Point>() {
+                            let dirs = [
+                                Point::new(1, 0),
+                                Point::new(-1, 0),
+                                Point::new(0, 1),
+                                Point::new(0, -1),
+                            ];
+                            let attacked_positions = dirs.map(|dir| *pt + dir);
+                            <(Entity, &Point)>::query()
+                                .filter(component::<Enemy>())
+                                .iter(ecs)
+                                .filter(|(_, p)| attacked_positions.contains(*p))
+                                .for_each(|(e, _)| {
+                                    // Attach a Stunned component to the enemy
+                                    commands.add_component(*e, Stunned(6));
+                                });
+                        }
+                    }
                 }
             }
             // Remove the message + the item entity

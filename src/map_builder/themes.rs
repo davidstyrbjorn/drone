@@ -32,10 +32,11 @@ impl CaveTheme {
 
 impl MapTheme for DungeonTheme {
     fn tile_to_render(&self, tile_type: TileType) -> FontCharType {
-        // TODO: Map Floor 2 + Floor 3 to decoration
         match tile_type {
-            TileType::Floor | TileType::Floor2 | TileType::Floor3 => to_cp437('M'),
-            TileType::Wall | TileType::Wall2 => to_cp437('#'),
+            TileType::Floor | TileType::Floor3 => to_cp437('L'),
+            TileType::Floor2 => to_cp437('M'),
+            TileType::Wall => to_cp437(']'),
+            TileType::Wall2 => to_cp437('#'),
             TileType::Exit => to_cp437('>'),
         }
     }
@@ -54,7 +55,6 @@ impl MapTheme for ForestTheme {
 }
 
 impl MapTheme for CaveTheme {
-    // TODO: Map Floor 2 + Floor 3 to decoration
     fn tile_to_render(&self, tile_type: TileType) -> FontCharType {
         match tile_type {
             TileType::Floor => to_cp437('-'),
