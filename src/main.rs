@@ -1,7 +1,9 @@
 use std::collections::HashSet;
 
+// Brings modules into scope
 mod camera;
 mod components;
+mod event_log;
 mod map;
 mod map_builder;
 mod spawner;
@@ -19,6 +21,7 @@ mod prelude {
     pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 2;
     pub use crate::camera::*;
     pub use crate::components::*;
+    pub use crate::event_log::*;
     pub use crate::map::*;
     pub use crate::map_builder::*;
     pub use crate::spawner::*;
@@ -64,6 +67,8 @@ impl State {
         resources.insert(Camera::new(map_builder.player_start));
         resources.insert(TurnState::Menu);
         resources.insert(map_builder.theme);
+        resources.insert(EventLog::new());
+
         Self {
             ecs,
             resources,
@@ -128,6 +133,7 @@ impl State {
         self.resources.insert(Camera::new(map_builder.player_start));
         self.resources.insert(TurnState::AwaitingInput);
         self.resources.insert(map_builder.theme);
+        self.resources.insert(EventLog::new());
     }
 
     fn game_over(&mut self, ctx: &mut BTerm) {
@@ -256,6 +262,7 @@ impl State {
         self.resources.insert(Camera::new(mb.player_start));
         self.resources.insert(TurnState::AwaitingInput);
         self.resources.insert(mb.theme);
+        self.resources.insert(EventLog::new());
     }
 }
 

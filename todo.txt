@@ -20,19 +20,18 @@
 
 - [x] NEW ITEM item that paralyzes enemies from moving for 3 turns (spooky screech)
 
-- [] ambience background sound https://docs.rs/rodio/latest/rodio/# 
-
-- [] sfx systems (message components + resource of sounds?) https://docs.rs/rodio/latest/rodio/#
 
 - [] redo enemies + items + balancing
 
-- [] new player sprite (DRONE)
+- [x] new player sprite (DRONE)
 
 - BUG [] items are spawning in walls
 
 - [x] main menu 
 
 - [] event log lower right corner
+
+- [] controls HUD
 
 - [x] limit inventory space to 10 items (10 alpha keys to use items so...)
 

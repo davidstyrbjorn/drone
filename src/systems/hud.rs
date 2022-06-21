@@ -6,7 +6,7 @@ use crate::prelude::*;
 #[read_component(Item)]
 #[read_component(Carried)]
 #[read_component(Name)]
-pub fn hud(ecs: &SubWorld) {
+pub fn hud(ecs: &SubWorld, #[resource] event_log: &mut EventLog) {
     // Query time!
     let mut health_query = <&Health>::query().filter(component::<Player>());
     let player_health = health_query.iter(ecs).nth(0).unwrap();
@@ -72,6 +72,13 @@ pub fn hud(ecs: &SubWorld) {
     if y > 3 {
         draw_batch.print_color(Point::new(3, 2), "Inventory", ColorPair::new(YELLOW, BLACK));
     }
+
+    // Event log render
+    let mut y = 10; // Shadowing the y variable from before
+    event_log.messages.iter().for_each(|msg| {
+        draw_batch.print(Point::new(3, y), &msg.message);
+        y += 1;
+    });
 
     draw_batch.submit(10000).expect("Batch error");
 }

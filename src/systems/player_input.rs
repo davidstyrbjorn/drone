@@ -84,6 +84,18 @@ pub fn player_input(
             _ => Point::new(0, 0),
         };
 
+        commands.push((
+            (),
+            WantsToLog {
+                log_entry: {
+                    LogEntry {
+                        message: "STÅNGKÅT FTW".to_string(),
+                        color: ColorPair::new(YELLOW, BLACK),
+                    }
+                },
+            },
+        ));
+
         // Grab player entity and destination
         let (player_entity, destination) = players
             .iter(ecs)

@@ -55,6 +55,12 @@ pub struct WantsToMove {
     pub destination: Point,
 }
 
+// Message compponent
+#[derive(Clone, Debug, PartialEq)]
+pub struct WantsToLog {
+    pub log_entry: LogEntry,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct WantsToAttack {
     pub attacker: Entity,
