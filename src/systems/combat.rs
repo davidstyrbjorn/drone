@@ -7,6 +7,7 @@ use crate::prelude::*;
 #[read_component(Damage)]
 #[read_component(Carried)]
 #[read_component(Stunned)]
+#[read_component(Name)]
 pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
     // Get our list of attackers
     let mut attackers = <(Entity, &WantsToAttack)>::query();
@@ -45,11 +46,37 @@ pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
                 .map(|(_, dmg)| dmg.0)
                 .sum();
 
-            let is_player = ecs
+            let victim_is_player = ecs
                 .entry_ref(*victim)
                 .unwrap()
                 .get_component::<Player>()
                 .is_ok();
+
+            let attacker_is_player = ecs
+                .entry_ref(*attacker)
+                .unwrap()
+                .get_component::<Player>()
+                .is_ok();
+
+            // Is our attacker the player and does the enemy have a name?
+            // Log it to event
+            if attacker_is_player {
+                if let Ok(name) = ecs.entry_ref(*victim).unwrap().get_component::<Name>() {
+                    commands.push((
+                        (),
+                        WantsToLog {
+                            log_entry: LogEntry {
+                                message: format!(
+                                    "Player attacked {} for {} damage",
+                                    name.0,
+                                    base_damage + weapon_damage
+                                ),
+                                color: ColorPair::new(WHITE, BLACK),
+                            },
+                        },
+                    ));
+                }
+            }
 
             // Does our victim have a Health component
             if let Ok(mut health) = ecs
@@ -60,11 +87,12 @@ pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
                 let final_damage = base_damage + weapon_damage;
 
                 health.current -= final_damage;
-                if health.current < 1 && !is_player {
+                if health.current < 1 && !victim_is_player {
                     commands.remove(*victim);
                 }
             }
         }
+
         commands.remove(*message);
     });
 }

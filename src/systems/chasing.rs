@@ -25,8 +25,10 @@ pub fn chasing(#[resource] map: &Map, ecs: &SubWorld, commands: &mut CommandBuff
     movers.iter(ecs).for_each(|(entity, pos, _, fov)| {
         // Check visibility to player
         if !fov.visible_tiles.contains(&player_pos) {
+            // Did not see player
             return;
         }
+
         let idx = map_idx(pos.x, pos.y);
         // Gets the lowest cost tile pointing towards the player
         if let Some(desination) = DijkstraMap::find_lowest_exit(&djikstra_map, idx, map) {

@@ -18,7 +18,7 @@ Templates(
             entity_type: Item,
             name: "All Seeing Eyes", glyph: '{', levels: [0, 1, 2],
             provides: Some([("MagicMap", 10)]),
-            frequency: 50
+            frequency: 0
         ),
         Template(
             entity_type: Item,

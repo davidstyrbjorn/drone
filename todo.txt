@@ -3,8 +3,6 @@
 
 - BUG [x] weapoon consume, can press and "consume" weapon items for it's effects
 
-- BUG [] all seeing eye reveals map exit
-
 - [x] implement cave theme 
 
 - [x] FOREST random TileType::Floor for decorations 
@@ -20,18 +18,21 @@
 
 - [x] NEW ITEM item that paralyzes enemies from moving for 3 turns (spooky screech)
 
-
-- [] redo enemies + items + balancing
-
 - [x] new player sprite (DRONE)
 
 - BUG [] items are spawning in walls
 
 - [x] main menu 
 
-- [] event log lower right corner
+- [x] event log lower right corner
 
-- [] controls HUD
+- [] redo enemies + items + balancing
+
+- [x] controls HUD
+
+- [] all seeing eye reveals map exit, it should not
+
+- [] log when exit is spotted
 
 - [x] limit inventory space to 10 items (10 alpha keys to use items so...)
 

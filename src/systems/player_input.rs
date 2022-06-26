@@ -23,10 +23,10 @@ pub fn player_input(
     if let Some(key) = *key {
         // Get our movement vector
         let delta = match key {
-            VirtualKeyCode::Left => Point::new(-1, 0),
-            VirtualKeyCode::Right => Point::new(1, 0),
-            VirtualKeyCode::Up => Point::new(0, -1),
-            VirtualKeyCode::Down => Point::new(0, 1),
+            VirtualKeyCode::Left | VirtualKeyCode::A => Point::new(-1, 0),
+            VirtualKeyCode::Right | VirtualKeyCode::D => Point::new(1, 0),
+            VirtualKeyCode::Up | VirtualKeyCode::W => Point::new(0, -1),
+            VirtualKeyCode::Down | VirtualKeyCode::S => Point::new(0, 1),
             // Picking up an item?
             VirtualKeyCode::G => {
                 let (player, player_pos) = players
@@ -83,18 +83,6 @@ pub fn player_input(
 
             _ => Point::new(0, 0),
         };
-
-        commands.push((
-            (),
-            WantsToLog {
-                log_entry: {
-                    LogEntry {
-                        message: "STÅNGKÅT FTW".to_string(),
-                        color: ColorPair::new(YELLOW, BLACK),
-                    }
-                },
-            },
-        ));
 
         // Grab player entity and destination
         let (player_entity, destination) = players

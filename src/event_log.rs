@@ -1,3 +1,5 @@
+use std::collections::LinkedList;
+
 use crate::prelude::*;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -7,11 +9,13 @@ pub struct LogEntry {
 }
 
 pub struct EventLog {
-    pub messages: Vec<LogEntry>,
+    pub messages: LinkedList<LogEntry>,
 }
 
 impl EventLog {
     pub fn new() -> Self {
-        Self { messages: vec![] }
+        Self {
+            messages: LinkedList::new(),
+        }
     }
 }

@@ -277,7 +277,7 @@ impl GameState for State {
         ctx.cls();
         ctx.set_active_console(1);
         ctx.cls();
-        ctx.set_active_console(2);
+        ctx.set_active_console(2); // HUD
         ctx.cls();
 
         // No need to worry about dupliactes, when we insert a resource of the same type
