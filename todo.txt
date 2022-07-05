@@ -1,3 +1,18 @@
+- [] draw players & monsters on one layer, draw items on another (below)
+
+- [] items spawn in wall on "cave" & "dungeon"
+
+- [] redo enemies + items + balancing
+
+- [] all seeing eye reveals map exit, it should not
+
+- [] log when exit is spotted
+
+- [] minimap? to see which parts of the map has been explored
+
+- [] new game title
+
+- [] new player sprite
 
 - BUG [x] weapon pickup bug, can pickup multiple weapon items
 
@@ -26,13 +41,7 @@
 
 - [x] event log lower right corner
 
-- [] redo enemies + items + balancing
-
 - [x] controls HUD
-
-- [] all seeing eye reveals map exit, it should not
-
-- [] log when exit is spotted
 
 - [x] limit inventory space to 10 items (10 alpha keys to use items so...)
 

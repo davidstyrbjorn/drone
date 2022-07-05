@@ -32,7 +32,7 @@ pub struct MapBuilder {
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator, map_level: u32) -> Self {
-        let mut theme_name: &str = "cave";
+        let theme_name: &str;
         // Build map and select appropiate theme
         let mut architect: Box<dyn MapArchitect> = match map_level {
             0 | 1 => {

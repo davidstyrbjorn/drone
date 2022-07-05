@@ -145,7 +145,8 @@ impl MapArchitect for CellularAutomataArchitect {
         let start = self.find_start(&mb.map);
         mb.monster_spawns = mb.spawn_monsters(&start, rng);
         mb.player_start = start;
-        mb.teleportation_crystal_start = mb.find_most_distant();
+        mb.teleportation_crystal_start = start + Point::new(1, 0);
+        // mb.teleportation_crystal_start = mb.find_most_distant();
         self.sprinkle_details(rng, &mut mb.map);
 
         mb
