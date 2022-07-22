@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use themes::*;
 
-use self::prefab::{FORTRESS, PREFAB_LIST};
+use self::prefab::PREFAB_LIST;
 
 mod automata;
 mod drunkard;
@@ -39,13 +39,15 @@ impl MapBuilder {
                 theme_name = "forest";
                 Box::new(automata::CellularAutomataArchitect {})
             }
-            2 | 3 => {
+            2 => {
                 theme_name = "cave";
                 Box::new(drunkard::DrunkardsWalkArchitect {})
             }
             _ => {
+                // theme_name = "dungeon";
                 theme_name = "dungeon";
                 Box::new(rooms::RoomArchitect { rooms: Vec::new() })
+                // Box::new(drunkard::DrunkardsWalkArchitect {})
             }
         };
 
@@ -54,6 +56,7 @@ impl MapBuilder {
         let prefab = PREFAB_LIST[rng.range(0, PREFAB_LIST.len())];
         prefab::apply_prefab(&mut mb, rng, prefab);
 
+        // Decide on theme
         match theme_name {
             "dungeon" => mb.theme = DungeonTheme::new(),
             "forest" => mb.theme = ForestTheme::new(),
@@ -91,33 +94,36 @@ impl MapBuilder {
                 .0,
         )
     }
+}
 
-    // Returns a vector of spawn points atleast 10 points away from the player
-    fn spawn_monsters(&self, start: &Point, rng: &mut RandomNumberGenerator) -> Vec<Point> {
-        const NUM_MONSTERS: usize = 50;
-        let mut spawnable_tiles: Vec<Point> = self
-            .map
-            .tiles
-            .iter()
-            .enumerate()
-            .filter(|(idx, t)| {
-                **t == TileType::Floor
-                    && DistanceAlg::Pythagoras.distance2d(*start, self.map.index_to_point2d(*idx))
-                        > 10.0
-            })
-            .map(|(idx, _)| self.map.index_to_point2d(idx))
-            .collect();
+// Returns a vector of spawn points atleast 10 points away from the player
+pub fn spawn_monsters(
+    mb: &MapBuilder,
+    start: &Point,
+    rng: &mut RandomNumberGenerator,
+) -> Vec<Point> {
+    let mut available_spawns: Vec<Point> = mb
+        .map
+        .tiles
+        .iter()
+        .enumerate()
+        .filter(|(i, t)| {
+            **t == TileType::Floor
+                && DistanceAlg::Pythagoras.distance2d(*start, mb.map.index_to_point2d(*i)) > 5.0
+        })
+        .map(|(i, _)| mb.map.index_to_point2d(i))
+        .collect();
 
-        let mut spawns = Vec::new();
-        for _ in 0..NUM_MONSTERS {
-            if spawnable_tiles.is_empty() {
-                break;
-            }
-            let target_index = rng.random_slice_index(&spawnable_tiles).unwrap();
-            spawns.push(spawnable_tiles[target_index].clone());
-            spawnable_tiles.remove(target_index);
+    const NUM_MONSTERS: usize = 50;
+    let mut spawns = Vec::new();
+    for _ in 0..NUM_MONSTERS {
+        if available_spawns.is_empty() {
+            break;
         }
-
-        spawns
+        let target_index = rng.random_slice_index(&available_spawns).unwrap();
+        spawns.push(available_spawns[target_index].clone());
+        available_spawns.remove(target_index);
     }
+
+    spawns
 }

@@ -5,8 +5,14 @@ use serde::Deserialize;
 use std::collections::HashSet;
 use std::fs::File;
 
+#[derive(Clone, Deserialize, Debug, PartialEq)]
+pub enum EntityType {
+    Enemy,
+    Item,
+}
+
 // This struct is reflected in the template.ron
-// Deserialize trait lets serde know we want to deserialize this truct
+// Deserialize trait lets serde know we want to deserialize sthis truct
 // all containing stuff must also support this trait
 // MOST Rust built-in types support this directive
 #[derive(Clone, Deserialize, Debug)]
@@ -19,12 +25,6 @@ pub struct Template {
     pub provides: Option<Vec<(String, i32)>>,
     pub hp: Option<i32>,
     pub base_damage: Option<i32>,
-}
-
-#[derive(Clone, Deserialize, Debug, PartialEq)]
-pub enum EntityType {
-    Enemy,
-    Item,
 }
 
 #[derive(Clone, Deserialize, Debug)]

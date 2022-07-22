@@ -5,14 +5,14 @@ const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
 // Clone for deep copy through .clone
 // Copy overrides the default = operator to copy over the values instead of moving
 // PartialEq lets us use == operator to compare
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum TileType {
-    Wall,
-    Wall2,
-    Floor,
-    Floor2, // decorative versions of floor
-    Floor3,
-    Exit,
+    Wall = 0,
+    Wall2 = 1,
+    Floor = 2,
+    Floor2 = 3, // decorative versions of floor
+    Floor3 = 4,
+    Exit = 5,
 }
 
 pub struct Map {

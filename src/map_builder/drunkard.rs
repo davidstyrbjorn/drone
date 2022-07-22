@@ -82,8 +82,9 @@ impl MapArchitect for DrunkardsWalkArchitect {
         };
 
         // Call a bunch of function and build the map
-        mb.fill(TileType::Wall);
         let center = Point::new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+
+        mb.fill(TileType::Wall);
         self.drunkard(&center, rng, &mut mb.map);
         // Walk until we have desired a percentage coverage
         while mb
@@ -117,9 +118,10 @@ impl MapArchitect for DrunkardsWalkArchitect {
                 .for_each(|(idx, _)| mb.map.tiles[idx] = TileType::Wall);
         }
 
-        mb.monster_spawns = mb.spawn_monsters(&center, rng);
         mb.player_start = center;
-        mb.teleportation_crystal_start = mb.find_most_distant();
+        // mb.teleportation_crystal_start = mb.find_most_distant();
+        mb.teleportation_crystal_start = mb.player_start + Point::new(1, 0);
+        mb.monster_spawns = spawn_monsters(&mb, &center, rng);
 
         // Carve some path decorations
         self.carve_decorations(

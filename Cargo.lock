@@ -589,6 +589,7 @@ version = "0.1.0"
 dependencies = [
  "bracket-lib",
  "legion",
+ "rand",
  "ron",
  "serde",
 ]

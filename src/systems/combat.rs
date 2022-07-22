@@ -62,19 +62,14 @@ pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
             // Log it to event
             if attacker_is_player {
                 if let Ok(name) = ecs.entry_ref(*victim).unwrap().get_component::<Name>() {
-                    commands.push((
-                        (),
-                        WantsToLog {
-                            log_entry: LogEntry {
-                                message: format!(
-                                    "Player attacked {} for {} damage",
-                                    name.0,
-                                    base_damage + weapon_damage
-                                ),
-                                color: ColorPair::new(WHITE, BLACK),
-                            },
-                        },
-                    ));
+                    EventLog::log(
+                        commands,
+                        format!(
+                            "Player attacked {} for {} damage",
+                            name.0,
+                            base_damage + weapon_damage
+                        ),
+                    );
                 }
             }
 

@@ -25,10 +25,10 @@ impl RoomArchitect {
     fn build_random_rooms(&mut self, rng: &mut RandomNumberGenerator, map: &mut Map) {
         while self.rooms.len() < NUM_ROOMS {
             let room = Rect::with_size(
-                rng.range(1, SCREEN_WIDTH - 10),
-                rng.range(1, SCREEN_HEIGHT - 10),
-                rng.range(2, 10),
-                rng.range(2, 10),
+                rng.range(1, SCREEN_WIDTH - 6),
+                rng.range(1, SCREEN_HEIGHT - 6),
+                rng.range(2, 6),
+                rng.range(2, 6),
             );
 
             // Check if this new randomly generated room intersects an existing

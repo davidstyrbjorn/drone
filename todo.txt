@@ -1,18 +1,14 @@
-- [] draw players & monsters on one layer, draw items on another (below)
+- [x] draw players & monsters on one layer, draw items on another (below)
 
-- [] items spawn in wall on "cave" & "dungeon"
+- [x] items spawn in wall on "cave" & "dungeon"
 
 - [] redo enemies + items + balancing
 
-- [] all seeing eye reveals map exit, it should not
+- [] enemy move every other turn?? 
 
-- [] log when exit is spotted
+- [] wait counter
 
-- [] minimap? to see which parts of the map has been explored
-
-- [] new game title
-
-- [] new player sprite
+- [x] new player sprite
 
 - BUG [x] weapon pickup bug, can pickup multiple weapon items
 
@@ -35,7 +31,7 @@
 
 - [x] new player sprite (DRONE)
 
-- BUG [] items are spawning in walls
+- BUG items are spawning in walls
 
 - [x] main menu 
 

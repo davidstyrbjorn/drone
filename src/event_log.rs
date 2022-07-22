@@ -18,4 +18,16 @@ impl EventLog {
             messages: LinkedList::new(),
         }
     }
+
+    pub fn log(commands: &mut CommandBuffer, msg: String) {
+        commands.push((
+            (),
+            WantsToLog {
+                log_entry: LogEntry {
+                    message: msg,
+                    color: ColorPair::new(WHITE, BLACK),
+                },
+            },
+        ));
+    }
 }

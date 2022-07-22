@@ -16,6 +16,7 @@ pub fn player_input(
     ecs: &mut SubWorld,
     commands: &mut CommandBuffer,
     #[resource] key: &Option<VirtualKeyCode>,
+    #[resource] map: &Map,
     #[resource] turn_state: &mut TurnState,
 ) {
     let mut players = <(Entity, &Point)>::query().filter(component::<Player>());
@@ -118,25 +119,25 @@ pub fn player_input(
                         destination,
                     },
                 ));
-                did_something = true;
+                // Check if destination is a wall tile type
+                did_something = map.can_enter_tile(destination);
             }
         }
 
-        *turn_state = TurnState::PlayerTurn;
-
         // TODO This seems a little buggy, look at later
-        // if did_something {
-        //     *turn_state = TurnState::PlayerTurn;
-        // } else {
-        //     // Check the wait counter on player
-        //     let mut player = <&mut Player>::query().iter_mut(ecs).nth(0).unwrap();
-        //     if player.wait_count > 0 {
-        //         *turn_state = TurnState::PlayerTurn;
-        //         player.wait_count -= 1;
-        //     } else {
-        //         *turn_state = TurnState::AwaitingInput;
-        //     }
-        // }
+        // 7/21/2022 this seems to work now... I didn't change anything though
+        if did_something {
+            *turn_state = TurnState::PlayerTurn;
+        } else {
+            // Check the wait counter on player
+            let mut player = <&mut Player>::query().iter_mut(ecs).nth(0).unwrap();
+            if player.wait_count > 0 {
+                *turn_state = TurnState::PlayerTurn;
+                player.wait_count -= 1;
+            } else {
+                *turn_state = TurnState::AwaitingInput;
+            }
+        }
     }
 }
 

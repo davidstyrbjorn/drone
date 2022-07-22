@@ -8,6 +8,7 @@ use crate::prelude::*;
 #[read_component(ProvidesStun)]
 #[read_component(Point)]
 #[write_component(Stunned)]
+#[read_component(Name)]
 pub fn use_items(ecs: &mut SubWorld, commands: &mut CommandBuffer, #[resource] map: &mut Map) {
     // to-do list of healings
     let mut healing_to_apply = Vec::<(Entity, i32)>::new();
@@ -24,10 +25,10 @@ pub fn use_items(ecs: &mut SubWorld, commands: &mut CommandBuffer, #[resource] m
                 }
                 if let Ok(_) = item.get_component::<ProvidesDungeonMap>() {
                     map.revealed_tiles.iter_mut().for_each(|t| *t = true);
+                    EventLog::log(commands, "The Magic Map reveals".to_string());
                 }
                 if let Ok(_) = item.get_component::<ProvidesStun>() {
                     // Look at neighbouring tiles and tell enemies that they are stunned
-
                     if let Ok(holder) = ecs.entry_ref(activate.used_by) {
                         if let Ok(pt) = holder.get_component::<Point>() {
                             let dirs = [
@@ -47,6 +48,7 @@ pub fn use_items(ecs: &mut SubWorld, commands: &mut CommandBuffer, #[resource] m
                                 });
                         }
                     }
+                    EventLog::log(commands, "Foes around stunned for 6 moves".to_string())
                 }
             }
             // Remove the message + the item entity
@@ -62,6 +64,10 @@ pub fn use_items(ecs: &mut SubWorld, commands: &mut CommandBuffer, #[resource] m
             if let Ok(health) = target.get_component_mut::<Health>() {
                 // Heal for heal.1 (tuple where the second is amount, check struct)
                 health.current = i32::min(health.max, health.current + heal.1);
+                // Check if entity has Named component
+                if let Ok(name) = target.get_component::<Name>() {
+                    EventLog::log(commands, format!("{} healed for {}hp", name.0, heal.1));
+                }
             }
         }
     }

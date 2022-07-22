@@ -15,8 +15,8 @@ mod prelude {
     pub use legion::systems::CommandBuffer;
     pub use legion::world::SubWorld;
     pub use legion::*;
-    pub const SCREEN_WIDTH: i32 = 80;
-    pub const SCREEN_HEIGHT: i32 = 50;
+    pub const SCREEN_WIDTH: i32 = 50;
+    pub const SCREEN_HEIGHT: i32 = 40;
     pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH / 2;
     pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 2;
     pub use crate::camera::*;
@@ -81,22 +81,17 @@ impl State {
     fn menu(&mut self, ctx: &mut BTerm) {
         ctx.set_active_console(2);
 
-        ctx.print_centered(40, "DRONE");
-        ctx.print_centered(45, "PRESS ANY BUTTON TO CRASH LAND ON EARTH");
+        ctx.print_centered(20, "DRONELIKE");
+        ctx.print_centered(23, "PRESS ANY BUTTON TO CRASH LAND ON A MYSTICAL PLANET");
         ctx.print_right(
             SCREEN_WIDTH * 2,
-            (SCREEN_HEIGHT * 2) - 5,
+            (SCREEN_HEIGHT * 2) - 3,
             "BY: DAVID STYRBJÖRN",
         );
         ctx.print_right(
             SCREEN_WIDTH * 2,
-            (SCREEN_HEIGHT * 2) - 3,
-            "ART: EMIL BERTHOLDSSON",
-        );
-        ctx.print_right(
-            SCREEN_WIDTH * 2,
             (SCREEN_HEIGHT * 2) - 1,
-            "BALANCE HELP: MAX BENECKE",
+            "ART: EMIL BERTHOLDSSON",
         );
 
         // Check if the user has pressed any key
@@ -208,6 +203,7 @@ impl State {
                 command_buffer.remove(*e);
             }
         }
+        command_buffer.flush(&mut self.ecs);
 
         // Mark field of view as dirty
         // Making it not retain to the next level
@@ -236,19 +232,19 @@ impl State {
             .iter_mut(&mut self.ecs)
             .for_each(|(player, pos)| {
                 player.map_level += 1;
+                player.wait_count += 4;
                 map_level = player.map_level;
                 pos.x = mb.player_start.x;
                 pos.y = mb.player_start.y;
             });
 
         // Decide on wheter we spawn staircase or teleportation crystal
-        if map_level == 4 {
+        if map_level == 3 {
             spawn_telerportation_crystal(&mut self.ecs, mb.teleportation_crystal_start);
         } else {
             let exit_idx = mb.map.point2d_to_index(mb.teleportation_crystal_start);
             mb.map.tiles[exit_idx] = TileType::Exit;
         }
-
         spawn_level(
             &mut self.ecs,
             &mut rng,
@@ -278,6 +274,8 @@ impl GameState for State {
         ctx.set_active_console(1);
         ctx.cls();
         ctx.set_active_console(2); // HUD
+        ctx.cls();
+        ctx.set_active_console(3);
         ctx.cls();
 
         // No need to worry about dupliactes, when we insert a resource of the same type
@@ -310,16 +308,17 @@ impl GameState for State {
 
 fn main() -> BError {
     let context = BTermBuilder::new()
-        .with_title("Drone in a Dungeon")
+        .with_title("Dronelike")
         .with_fps_cap(144.0)
         .with_dimensions(DISPLAY_WIDTH, DISPLAY_HEIGHT)
-        .with_tile_dimensions(32, 32)
+        .with_tile_dimensions(48, 48)
         .with_resource_path("resources/")
         .with_font("dungeonfont.png", 32, 32)
         .with_font("terminal8x8.png", 8, 8)
         .with_simple_console(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
         .with_simple_console_no_bg(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
         .with_simple_console_no_bg(SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2, "terminal8x8.png")
+        .with_simple_console_no_bg(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
         .build()?;
 
     main_loop(context, State::new())

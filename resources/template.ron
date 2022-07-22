@@ -3,83 +3,82 @@ Templates(
         // normal potion
         Template(
             entity_type: Item,
-            name: "Healing Potion", glyph: '!', levels: [0, 1, 2],
-            provides: Some([("Healing", 6)]),
-            frequency: 0
-        ),
-        // Weak ass potion
-        Template(
-            entity_type: Item,
-            name: "Healing Potion", glyph: '!', levels: [0, 1, 2],
+            name: "Healing Potion", glyph: '!', levels: [0, 1],
             provides: Some([("Healing", 2)]),
-            frequency: 0
-        ),
-        Template(
-            entity_type: Item,
-            name: "All Seeing Eyes", glyph: '{', levels: [0, 1, 2],
-            provides: Some([("MagicMap", 10)]),
-            frequency: 0
-        ),
-        Template(
-            entity_type: Item,
-            name: "Ground Stomp", glyph: 'e', levels: [0, 1, 2],
-            provides: Some([("GroundStomp", 10)]),
             frequency: 2
+        ),
+        // good potion
+        Template(
+            entity_type: Item,
+            name: "Healing Potion", glyph: '!', levels: [2, 3],
+            provides: Some([("Healing", 4)]),
+            frequency: 2
+        ),
+        Template(
+            entity_type: Item,
+            name: "Magic Map", glyph: '{', levels: [1, 2],
+            provides: Some([("MagicMap", 0)]),
+            frequency: 2
+        ),
+        Template(
+            entity_type: Item,
+            name: "Ground Stomp", glyph: 'e', levels: [2, 3],
+            provides: Some([("GroundStomp", 10)]),
+            frequency: 1
         ),
         /* ENEMIES */
         Template (
             entity_type: Enemy,
-            name: "Goblin", glyph: 'g', levels: [0],
+            name: "Goblin", glyph: 'g', levels: [0, 1],
             hp: Some(1),
-            frequency: 2,
+            frequency: 3,
             base_damage: Some(1)
         ),
         Template(
             entity_type: Enemy,
-            name: "Orc", glyph: 'o', levels: [0, 1],
+            name: "Orc", glyph: 'o', levels: [1, 2],
             hp: Some(2),
-            frequency: 2,
+            frequency: 3,
             base_damage: Some(1)
         ),
         Template(
             entity_type: Enemy,
-            name: "Ogre", glyph: 'O', levels: [1, 2],
+            name: "Ogre", glyph: 'O', levels: [2, 3],
             hp: Some(5),
-            frequency: 1,
+            frequency: 3,
             base_damage: Some(2)
         ),
         Template(
             entity_type: Enemy,
-            name: "Ettin", glyph: 'E', levels: [2],
-            hp: Some(10),
-            frequency: 1,
-            base_damage: Some(3)
+            name: "Ogre", glyph: 'O', levels: [2, 3],
+            hp: Some(5),
+            frequency: 3,
+            base_damage: Some(2)
         ),
-        // GOAT
-        Template(
+        Template( // GOAT
             entity_type: Enemy,
-            name: "Goat", glyph: 'D', levels: [0],
-            hp: Some(1),
-            frequency: 1,
+            name: "GOAT", glyph: 'D', levels: [1],
+            hp: Some(3),
+            frequency: 2,
             base_damage: Some(0)
         ),
         /* WEAPONS */
         Template(
             entity_type: Item,
-            name: "Rusty Sword", glyph: 's', levels: [0,1],
-            frequency: 1,
+            name: "Rusty Sword", glyph: 's', levels: [1],
+            frequency: 2,
             base_damage: Some(1)
         ),
         Template(
             entity_type: Item,
-            name: "Shiny Sword", glyph: 'S', levels: [2,3],
-            frequency: 1,
+            name: "Shiny Sword", glyph: 'S', levels: [2],
+            frequency: 2,
             base_damage: Some(2)
         ),
         Template(
             entity_type: Item,
-            name: "Huge Sword", glyph: '/', levels: [4],
-            frequency: 1,
+            name: "Huge Sword", glyph: '/', levels: [3],
+            frequency: 2,
             base_damage: Some(3)
         ),
     ]

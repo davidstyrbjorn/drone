@@ -35,11 +35,12 @@ pub fn spawn_player(ecs: &mut World, pos: Point) {
             glyph: to_cp437('@'),
         },
         Health {
-            current: 1000,
-            max: 1000,
+            current: 8,
+            max: 10,
         },
         FieldOfView::new(8),
-        Damage(100),
+        Damage(1),
+        Name("Drone".to_string()),
     ));
 }
 
