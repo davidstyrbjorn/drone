@@ -67,6 +67,7 @@ pub fn player_input(
                         // Remove point and add carried to make it dissapear from map and be carried by player
                         commands.remove_component::<Point>(*entity);
                         commands.add_component(*entity, Carried(player));
+                        did_something = true;
                     });
 
                 Point::new(0, 0)

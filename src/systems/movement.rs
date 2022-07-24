@@ -13,7 +13,7 @@ pub fn movement(
     commands: &mut CommandBuffer,
 ) {
     if map.can_enter_tile(want_move.destination) {
-        if let Ok(entry) = ecs.entry_ref(want_move.entity) {
+        if let Ok(mut entry) = ecs.entry_mut(want_move.entity) {
             if let Ok(fov) = entry.get_component::<FieldOfView>() {
                 commands.add_component(want_move.entity, fov.clone_dirty());
 
@@ -25,6 +25,7 @@ pub fn movement(
                     });
                 }
             }
+
             // If want_move.entity has a Stunned, don't move
             if entry.get_component::<Stunned>().is_err() {
                 // By adding a new point we replace the existing one

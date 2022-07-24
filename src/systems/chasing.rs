@@ -6,7 +6,14 @@ use crate::prelude::*;
 #[read_component(Health)]
 #[read_component(Player)]
 #[read_component(FieldOfView)]
-pub fn chasing(#[resource] map: &Map, ecs: &SubWorld, commands: &mut CommandBuffer) {
+#[write_component(MoveEveryOther)]
+pub fn chasing(#[resource] map: &Map, ecs: &mut SubWorld, commands: &mut CommandBuffer) {
+    // Go through each MoveEveryOther entity and toggle their value
+    let mut every_other_movers = <&mut MoveEveryOther>::query();
+    every_other_movers.iter_mut(ecs).for_each(|met| {
+        met.0 = !met.0; // Flip the bool
+    });
+
     // Find all entities with both point and chasing component
     let mut movers = <(Entity, &Point, &ChasingPlayer, &FieldOfView)>::query();
     // Get the player
@@ -27,6 +34,15 @@ pub fn chasing(#[resource] map: &Map, ecs: &SubWorld, commands: &mut CommandBuff
         if !fov.visible_tiles.contains(&player_pos) {
             // Did not see player
             return;
+        }
+
+        // Check every other
+        if let Ok(entity_ref) = ecs.entry_ref(*entity) {
+            if let Ok(move_every_other) = entity_ref.get_component::<MoveEveryOther>() {
+                if move_every_other.0 {
+                    return;
+                }
+            }
         }
 
         let idx = map_idx(pos.x, pos.y);

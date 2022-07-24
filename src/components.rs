@@ -43,6 +43,9 @@ pub struct MovingRandomly; // Tag component as the others above
 pub struct ChasingPlayer;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
+pub struct MoveEveryOther(pub bool); // Tag component, bool is used for flagging if it can move or not
+
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Item;
 
 #[derive(Clone, Copy, Debug, PartialEq)]

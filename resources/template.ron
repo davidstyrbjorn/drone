@@ -39,13 +39,6 @@ Templates(
             name: "Orc", glyph: 'o', levels: [1, 2],
             hp: Some(2),
             frequency: 3,
-            base_damage: Some(1)
-        ),
-        Template(
-            entity_type: Enemy,
-            name: "Ogre", glyph: 'O', levels: [2, 3],
-            hp: Some(5),
-            frequency: 3,
             base_damage: Some(2)
         ),
         Template(
@@ -53,13 +46,20 @@ Templates(
             name: "Ogre", glyph: 'O', levels: [2, 3],
             hp: Some(5),
             frequency: 3,
-            base_damage: Some(2)
+            base_damage: Some(3)
+        ),
+        Template(
+            entity_type: EnemyEveryOther,
+            name: "Ogre", glyph: 'E', levels: [2, 3],
+            hp: Some(4),
+            frequency: 3,
+            base_damage: Some(4)
         ),
         Template( // GOAT
-            entity_type: Enemy,
-            name: "GOAT", glyph: 'D', levels: [1],
+            entity_type: EnemyEveryOther,
+            name: "GOAT", glyph: 'D', levels: [0],
             hp: Some(3),
-            frequency: 2,
+            frequency: 1,
             base_damage: Some(0)
         ),
         /* WEAPONS */

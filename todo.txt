@@ -4,9 +4,9 @@
 
 - [] redo enemies + items + balancing
 
-- [] enemy move every other turn?? 
+- [] enemy move every other turn
 
-- [] wait counter
+- [x] wait counter
 
 - [x] new player sprite
 

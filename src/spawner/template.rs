@@ -8,6 +8,7 @@ use std::fs::File;
 #[derive(Clone, Deserialize, Debug, PartialEq)]
 pub enum EntityType {
     Enemy,
+    EnemyEveryOther,
     Item,
 }
 
@@ -99,10 +100,10 @@ impl Templates {
             Name(template.name.clone()),
         ));
 
-        // Now match type
+        // Now match type and add the correct bag of components
         match template.entity_type {
             EntityType::Item => commands.add_component(entity, Item {}),
-            EntityType::Enemy => {
+            EntityType::Enemy | EntityType::EnemyEveryOther => {
                 commands.add_component(entity, Enemy {});
                 commands.add_component(entity, FieldOfView::new(6));
                 commands.add_component(entity, ChasingPlayer);
@@ -113,6 +114,10 @@ impl Templates {
                         max: template.hp.unwrap(),
                     },
                 );
+                // If it is type Enemy_Every_Other also add that component
+                if template.entity_type == EntityType::EnemyEveryOther {
+                    commands.add_component(entity, MoveEveryOther(false));
+                }
             }
         }
 
