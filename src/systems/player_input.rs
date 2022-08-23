@@ -47,7 +47,7 @@ pub fn player_input(
                 items
                     .iter(ecs)
                     .filter(|(_entity, _item, &item_pos)| {
-                        (item_pos == player_pos && number_of_carried_components <= 10)
+                        (item_pos == player_pos && number_of_carried_components <= 9)
                     })
                     .for_each(|(entity, _item, _item_pos)| {
                         // Ocotupus-preventing code for multiple weapons on player

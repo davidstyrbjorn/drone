@@ -4,7 +4,11 @@
 
 - [] redo enemies + items + balancing
 
-- [] enemy move every other turn
+- [x] enemy move every other turn
+
+- [] player can pick up 10 items (should stop at 9)
+
+- [] mouse hover text is below graphics, should be same as UI
 
 - [x] wait counter
 

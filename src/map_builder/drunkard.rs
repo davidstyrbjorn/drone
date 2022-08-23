@@ -119,8 +119,7 @@ impl MapArchitect for DrunkardsWalkArchitect {
         }
 
         mb.player_start = center;
-        // mb.teleportation_crystal_start = mb.find_most_distant();
-        mb.teleportation_crystal_start = mb.player_start + Point::new(1, 0);
+        mb.teleportation_crystal_start = mb.find_most_distant();
         mb.monster_spawns = spawn_monsters(&mb, &center, rng);
 
         // Carve some path decorations
