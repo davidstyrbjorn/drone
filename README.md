@@ -15,3 +15,6 @@ Through the book I got to develop my own dungeon crawler rogulike game! This is 
 [You can play the game on itch.io](https://davidstyrbjorn.itch.io/drone) 
 
 ![Imgur](https://i.imgur.com/VApinXC.png)
+
+## Libraries
+The game in its core uses *Legion* to get ECS into the code. *bracket-lib* to render glyphs and such to a window. *wasm-pack* for easy compilation the webassembly target. 
