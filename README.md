@@ -7,6 +7,8 @@ Through the book I got to develop my own dungeon crawler rogulike game! This is 
 - New enemy variety 
 - New items
 - Decals on map for decoration
+- Added more UI elements
+- Adjusted rendering layers
 - Webassembly build (!!!)
 - New graphics (made by Emil Bertholdsson)
 
