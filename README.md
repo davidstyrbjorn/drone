@@ -12,7 +12,7 @@ Through the book I got to develop my own dungeon crawler rogulike game! This is 
 - Webassembly build (!!!)
 - New graphics (made by Emil Bertholdsson)
 
-[You can play the game on itch.io](https://davidstyrbjorn.itch.io/drone) 
+[You can play the game on itch.io](https://davidstyrbjorn.itch.io/drone) (It loads and runs very fast directly in the browser 😊)
 
 ![Imgur](https://i.imgur.com/VApinXC.png)
 
